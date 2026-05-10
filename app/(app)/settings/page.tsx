@@ -3,11 +3,21 @@
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { Play, Plus, Search, UserPlus, WifiOff, X } from 'lucide-react'
+import { MoreHorizontal, Pencil, Play, Plus, Search, Trash2, UserMinus, UserPlus, WifiOff, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import {
   Dialog,
   DialogContent,
@@ -16,6 +26,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Select,
   SelectContent,
@@ -135,30 +152,68 @@ function AccountTab() {
   )
 }
 
-const TEAM_MEMBERS = [
-  { name: 'Santiago Garces', email: 'santiago@alwon.io', role: 'Store Manager', status: 'active' as const },
-  { name: 'Carlos Rodriguez', email: 'carlos@alwon.io', role: 'Security', status: 'active' as const },
-  { name: 'Sofia Torres', email: 'sofia@alwon.io', role: 'Regional Ops', status: 'active' as const },
-  { name: 'Diego Perez', email: 'diego@alwon.io', role: 'Cashier', status: 'inactive' as const },
+type TeamMember = {
+  id: string
+  name: string
+  email: string
+  role: string
+  status: 'active' | 'inactive'
+}
+
+const INITIAL_TEAM_MEMBERS: TeamMember[] = [
+  { id: 'tm-1', name: 'Santiago Garces', email: 'santiago@alwon.io', role: 'Store Manager', status: 'active' },
+  { id: 'tm-2', name: 'Carlos Rodriguez', email: 'carlos@alwon.io', role: 'Security', status: 'active' },
+  { id: 'tm-3', name: 'Sofia Torres', email: 'sofia@alwon.io', role: 'Regional Ops', status: 'active' },
+  { id: 'tm-4', name: 'Diego Perez', email: 'diego@alwon.io', role: 'Cashier', status: 'inactive' },
 ]
 
 function TeamTab() {
+  const [members, setMembers] = useState<TeamMember[]>(INITIAL_TEAM_MEMBERS)
   const [query, setQuery] = useState('')
   const [inviteOpen, setInviteOpen] = useState(false)
   const [inviteEmail, setInviteEmail] = useState('')
   const [inviteRole, setInviteRole] = useState<string>(INVITE_ROLES[4])
+  const [renameOpen, setRenameOpen] = useState(false)
+  const [renameDraft, setRenameDraft] = useState('')
+  const [renameTargetId, setRenameTargetId] = useState<string | null>(null)
+  const [removeTarget, setRemoveTarget] = useState<TeamMember | null>(null)
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return TEAM_MEMBERS
-    return TEAM_MEMBERS.filter(
+    if (!q) return members
+    return members.filter(
       (m) =>
         m.name.toLowerCase().includes(q) ||
         m.email.toLowerCase().includes(q) ||
         m.role.toLowerCase().includes(q) ||
         m.status.includes(q)
     )
-  }, [query])
+  }, [members, query])
+
+  const openRename = (m: TeamMember) => {
+    setRenameTargetId(m.id)
+    setRenameDraft(m.name)
+    setRenameOpen(true)
+  }
+
+  const saveRename = () => {
+    const name = renameDraft.trim()
+    if (!name || !renameTargetId) {
+      toast.error('Enter a name.')
+      return
+    }
+    setMembers((prev) => prev.map((m) => (m.id === renameTargetId ? { ...m, name } : m)))
+    toast.success('Name updated')
+    setRenameOpen(false)
+    setRenameTargetId(null)
+  }
+
+  const confirmRemoveMember = () => {
+    if (!removeTarget) return
+    setMembers((prev) => prev.filter((m) => m.id !== removeTarget.id))
+    toast.success(`Removed ${removeTarget.name} from the team`)
+    setRemoveTarget(null)
+  }
 
   const sendInvite = () => {
     const email = inviteEmail.trim()
@@ -197,29 +252,114 @@ function TeamTab() {
           <span className="text-xs text-muted-foreground font-medium w-40">Email</span>
           <span className="text-xs text-muted-foreground font-medium w-28">Role</span>
           <span className="text-xs text-muted-foreground font-medium w-20 text-right">Status</span>
+          <span className="w-10 shrink-0" aria-hidden />
         </div>
         {filtered.length === 0 ? (
           <div className="px-4 py-10 text-center text-sm text-muted-foreground">No people match your search.</div>
         ) : (
           filtered.map((m) => (
             <div
-              key={m.email}
+              key={m.id}
               className="flex items-center gap-3 px-4 border-b hover:bg-muted/40 transition-colors"
               style={{ height: 48 }}
             >
-              <span className="text-sm font-medium flex-1">{m.name}</span>
-              <span className="text-xs w-40 text-muted-foreground">{m.email}</span>
-              <span className="text-sm w-28 text-muted-foreground">{m.role}</span>
-              <span className="w-20 flex justify-end">
+              <span className="text-sm font-medium flex-1 min-w-0 truncate">{m.name}</span>
+              <span className="text-xs w-40 text-muted-foreground truncate">{m.email}</span>
+              <span className="text-sm w-28 text-muted-foreground truncate">{m.role}</span>
+              <span className="w-20 flex justify-end shrink-0">
                 <span className="flex items-center gap-1.5">
                   <span className={`size-1.5 rounded-full shrink-0 ${m.status === 'active' ? 'bg-green-500' : 'bg-muted-foreground'}`} />
                   <span className="text-xs text-muted-foreground">{m.status === 'active' ? 'Active' : 'Inactive'}</span>
                 </span>
               </span>
+              <div className="flex w-10 shrink-0 justify-end">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      className="size-8 shrink-0 text-muted-foreground"
+                      aria-label={`Actions for ${m.name}`}
+                    >
+                      <MoreHorizontal className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem className="gap-2" onSelect={() => openRename(m)}>
+                      <Pencil className="size-3.5" />
+                      Rename
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      variant="destructive"
+                      className="gap-2"
+                      onSelect={() => setRemoveTarget(m)}
+                    >
+                      <UserMinus className="size-3.5" />
+                      Remove from team
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
           ))
         )}
       </Card>
+
+      <Dialog
+        open={renameOpen}
+        onOpenChange={(o) => {
+          setRenameOpen(o)
+          if (!o) setRenameTargetId(null)
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Rename team member</DialogTitle>
+            <DialogDescription>This updates how their name appears in Alwon.</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="rename-member">Display name</Label>
+            <Input
+              id="rename-member"
+              value={renameDraft}
+              onChange={(e) => setRenameDraft(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && saveRename()}
+            />
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setRenameOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="button" onClick={saveRename}>
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={removeTarget !== null} onOpenChange={(o) => !o && setRemoveTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove from team?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {removeTarget
+                ? `${removeTarget.name} (${removeTarget.email}) will lose access to this workspace. This cannot be undone from this demo.`
+                : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={confirmRemoveMember}
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
         <DialogContent>
@@ -285,19 +425,64 @@ function buildInitialCameras(): CameraRow[] {
   }))
 }
 
-function CameraLivePanel({ camera, onClose }: { camera: CameraRow; onClose: () => void }) {
+function CameraLivePanel({
+  camera,
+  onClose,
+  onSaveLocation,
+  onDelete,
+}: {
+  camera: CameraRow
+  onClose: () => void
+  onSaveLocation: (location: string) => void
+  onDelete: () => void
+}) {
   const isLive = camera.status === 'online'
+  const [locationDraft, setLocationDraft] = useState(camera.location)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+
+  useEffect(() => {
+    setLocationDraft(camera.location)
+  }, [camera.id, camera.location])
+
+  const saveLocation = () => {
+    const next = locationDraft.trim() || 'Unassigned'
+    onSaveLocation(next)
+    toast.success('Display name saved')
+  }
+
+  const handleDelete = () => {
+    onDelete()
+    setDeleteOpen(false)
+  }
 
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col bg-card">
-      <div className="flex shrink-0 items-start justify-between gap-3 border-b bg-muted/30 px-4 py-3">
-        <div className="min-w-0">
-          <h3 className="truncate font-mono text-sm font-semibold tracking-tight">{camera.id}</h3>
-          <p className="truncate text-xs text-muted-foreground">{camera.location}</p>
+      <div className="flex shrink-0 flex-col gap-3 border-b bg-muted/30 px-4 py-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="truncate font-mono text-sm font-semibold tracking-tight">{camera.id}</h3>
+            <p className="truncate text-xs text-muted-foreground">{camera.location}</p>
+          </div>
+          <Button type="button" variant="ghost" size="icon-sm" className="shrink-0" onClick={onClose}>
+            <X className="size-4" />
+          </Button>
         </div>
-        <Button type="button" variant="ghost" size="icon-sm" className="shrink-0" onClick={onClose}>
-          <X className="size-4" />
-        </Button>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor={`cam-display-${camera.id}`}>Display name</Label>
+          <div className="flex gap-2">
+            <Input
+              id={`cam-display-${camera.id}`}
+              value={locationDraft}
+              onChange={(e) => setLocationDraft(e.target.value)}
+              placeholder="e.g. Checkout lane 2"
+              className="min-w-0 flex-1"
+              onKeyDown={(e) => e.key === 'Enter' && saveLocation()}
+            />
+            <Button type="button" size="sm" className="shrink-0" onClick={saveLocation}>
+              Save
+            </Button>
+          </div>
+        </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
@@ -366,6 +551,39 @@ function CameraLivePanel({ camera, onClose }: { camera: CameraRow; onClose: () =
           </div>
         )}
       </div>
+
+      <div className="shrink-0 border-t px-4 py-3" style={{ borderColor: 'var(--border)' }}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="gap-1.5 border-destructive/40 text-destructive hover:bg-destructive/10 hover:text-destructive"
+          onClick={() => setDeleteOpen(true)}
+        >
+          <Trash2 className="size-3.5" />
+          Remove camera
+        </Button>
+        <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove this camera?</AlertDialogTitle>
+              <AlertDialogDescription>
+                {camera.id} will be removed from your dashboard and alerts. Hardware IDs stay the same if you add it
+                again later.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={handleDelete}
+              >
+                Remove
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </div>
   )
 }
@@ -413,6 +631,16 @@ function CamerasTab() {
     setNewLocation('')
   }
 
+  const saveCameraLocation = (id: string, location: string) => {
+    setCameras((prev) => prev.map((c) => (c.id === id ? { ...c, location } : c)))
+  }
+
+  const removeCamera = (id: string) => {
+    setCameras((prev) => prev.filter((c) => c.id !== id))
+    setSelectedCameraId((cur) => (cur === id ? null : cur))
+    toast.success(`Removed ${id}`)
+  }
+
   const selectedCamera = selectedCameraId
     ? cameras.find((c) => c.id === selectedCameraId)
     : undefined
@@ -437,7 +665,7 @@ function CamerasTab() {
       </div>
 
       <div
-        className="flex min-h-[min(520px,calc(100vh-320px))] flex-row overflow-hidden rounded-xl border"
+        className="flex h-[min(720px,calc(100vh-240px))] min-h-0 flex-row overflow-hidden rounded-xl border"
         style={{ borderColor: 'var(--border)', background: 'var(--card)' }}
       >
         <div
@@ -505,7 +733,12 @@ function CamerasTab() {
             className="flex h-full min-h-0 min-w-0 w-[58%] shrink-0 flex-col overflow-hidden border-l"
             style={{ borderColor: 'var(--border)' }}
           >
-            <CameraLivePanel camera={selectedCamera} onClose={() => setSelectedCameraId(null)} />
+            <CameraLivePanel
+              camera={selectedCamera}
+              onClose={() => setSelectedCameraId(null)}
+              onSaveLocation={(loc) => saveCameraLocation(selectedCamera.id, loc)}
+              onDelete={() => removeCamera(selectedCamera.id)}
+            />
           </div>
         )}
       </div>
