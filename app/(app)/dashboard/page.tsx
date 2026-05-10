@@ -104,7 +104,7 @@ export default function DashboardPage() {
       {/* Metric strip */}
       <div
         className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6"
-        style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
+        style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
       >
         <MetricTile
           label="EVENTS PROCESSED"
@@ -142,13 +142,13 @@ export default function DashboardPage() {
       {/* Two-column main */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Left: event stream */}
-        <div className="lg:col-span-3 flex flex-col" style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+        <div className="lg:col-span-3 flex flex-col" style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
           <div className="px-4 pt-4">
             <SectionHeader
               number="01"
               title="LIVE EVENT STREAM"
               action={
-                <Link href="/events" style={{ color: 'var(--accent)' }}>
+                <Link href="/events" style={{ color: 'var(--brand-accent)' }}>
                   View all →
                 </Link>
               }
@@ -160,13 +160,13 @@ export default function DashboardPage() {
         {/* Right column */}
         <div className="lg:col-span-2 flex flex-col gap-4">
           {/* Flagged for review */}
-          <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+          <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
             <div className="px-4 pt-4 pb-2">
               <SectionHeader
                 number="02"
                 title="FLAGGED FOR REVIEW"
                 action={
-                  <Link href="/loss-prevention" style={{ color: 'var(--accent)' }}>
+                  <Link href="/loss-prevention" style={{ color: 'var(--brand-accent)' }}>
                     View queue →
                   </Link>
                 }
@@ -213,13 +213,13 @@ export default function DashboardPage() {
           </div>
 
           {/* Store health */}
-          <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+          <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
             <div className="px-4 pt-4 pb-2">
               <SectionHeader
                 number="03"
                 title="STORE HEALTH"
                 action={
-                  <Link href="/stores" style={{ color: 'var(--accent)' }}>
+                  <Link href="/stores" style={{ color: 'var(--brand-accent)' }}>
                     All stores →
                   </Link>
                 }
@@ -255,7 +255,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Today's anomalies */}
-          <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+          <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
             <div className="px-4 pt-4 pb-2">
               <SectionHeader number="04" title="TODAY'S ANOMALIES" />
             </div>
@@ -281,7 +281,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Heatmap */}
-      <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+      <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
         <div className="px-4 pt-4">
           <SectionHeader number="02" title="OPERATIONS HEATMAP" />
         </div>

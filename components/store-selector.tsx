@@ -12,7 +12,7 @@ export function StoreSelector({ compact = false }: { compact?: boolean }) {
       <select
         value={selectedStore}
         onChange={(e) => setStore(e.target.value)}
-        className="appearance-none data-mono text-xs pr-5 pl-2 py-1 rounded-sm cursor-pointer"
+        className="appearance-none data-mono text-xs pr-5 pl-2 py-1 rounded-md cursor-pointer"
         style={{
           background: 'var(--bg-elevated)',
           border: '1px solid var(--border-strong)',

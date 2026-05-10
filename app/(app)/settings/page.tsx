@@ -62,9 +62,9 @@ function AccountTab() {
       <button
         onClick={() => toast('Settings saved.')}
         className="data-mono text-xs px-4 py-2 self-start transition-colors"
-        style={{ background: 'var(--accent)', color: '#fff' }}
-        onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--accent-hover)' }}
-        onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--accent)' }}
+        style={{ background: 'var(--brand-accent)', color: '#fff' }}
+        onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--brand-accent-hover)' }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--brand-accent)' }}
       >
         SAVE CHANGES
       </button>
@@ -167,7 +167,7 @@ function IntegrationsTab() {
         <div
           key={int.name}
           className="flex items-center justify-between px-4 py-3"
-          style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
+          style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
         >
           <div>
             <p className="text-sm" style={{ color: 'var(--fg)' }}>{int.name}</p>
@@ -183,7 +183,7 @@ function IntegrationsTab() {
             <button
               className="px-3 py-1 data-mono text-xs transition-colors"
               style={{ border: '1px solid var(--border-strong)', color: 'var(--fg-muted)' }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--brand-accent)' }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-strong)' }}
             >
               {int.status === 'connected' ? 'CONFIGURE' : 'CONNECT'}
@@ -201,7 +201,7 @@ function ApiKeysTab() {
       <p className="text-sm" style={{ color: 'var(--fg-muted)' }}>
         API keys provide programmatic access to the Alwon platform. Keep them secret.
       </p>
-      <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+      <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
         <div className="flex items-center gap-3 px-4 py-2" style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg)' }}>
           <span className="section-label flex-1">KEY</span>
           <span className="section-label w-28">CREATED</span>
@@ -228,7 +228,7 @@ function ApiKeysTab() {
         onClick={() => toast('New API key generated. Copy it now — it will not be shown again.')}
         className="data-mono text-xs px-4 py-2 self-start transition-colors"
         style={{ border: '1px solid var(--border-strong)', color: 'var(--fg-muted)' }}
-        onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--accent)'; e.currentTarget.style.color = 'var(--accent)' }}
+        onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--brand-accent)'; e.currentTarget.style.color = 'var(--brand-accent)' }}
         onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-strong)'; e.currentTarget.style.color = 'var(--fg-muted)' }}
       >
         + GENERATE NEW KEY
@@ -287,7 +287,7 @@ export default function SettingsPage() {
             className="px-4 py-2.5 data-mono text-xs transition-colors"
             style={{
               color: activeTab === tab.id ? 'var(--fg)' : 'var(--fg-muted)',
-              borderBottom: activeTab === tab.id ? '2px solid var(--accent)' : '2px solid transparent',
+              borderBottom: activeTab === tab.id ? '2px solid var(--brand-accent)' : '2px solid transparent',
               marginBottom: -1,
             }}
           >

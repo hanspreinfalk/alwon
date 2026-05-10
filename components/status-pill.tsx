@@ -5,7 +5,7 @@ const DOT_COLORS: Record<string, string> = {
   resolved: 'var(--success)',
   investigating: 'var(--warning)',
   dismissed: 'var(--fg-dim)',
-  info: 'var(--accent)',
+  info: 'var(--brand-accent)',
   warning: 'var(--warning)',
   online: 'var(--success)',
   degraded: 'var(--warning)',

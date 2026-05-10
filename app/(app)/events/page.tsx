@@ -71,7 +71,7 @@ function EventDetailPanel({ event, onClose }: { event: StoreEvent; onClose: () =
               className="flex items-center justify-center rounded-full cursor-pointer transition-colors"
               style={{ width: 44, height: 44, background: 'rgba(6,144,252,0.15)', border: '1px solid var(--border-accent)' }}
             >
-              <Play size={16} style={{ color: 'var(--accent)', marginLeft: 2 }} />
+              <Play size={16} style={{ color: 'var(--brand-accent)', marginLeft: 2 }} />
             </div>
             <p className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>{event.source}</p>
           </div>
@@ -82,7 +82,7 @@ function EventDetailPanel({ event, onClose }: { event: StoreEvent; onClose: () =
           >
             <span className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>00:00</span>
             <div className="flex-1 h-px" style={{ background: 'var(--border-strong)' }}>
-              <div className="h-full w-1/3" style={{ background: 'var(--accent)' }} />
+              <div className="h-full w-1/3" style={{ background: 'var(--brand-accent)' }} />
             </div>
             <span className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>01:30</span>
           </div>
@@ -257,8 +257,8 @@ export default function EventsPage() {
             onClick={() => paused ? resumeStream() : pauseStream()}
             className="flex items-center gap-2 px-3 py-1.5 data-mono text-xs transition-colors"
             style={{
-              border: `1px solid ${paused ? 'var(--success)' : 'var(--accent)'}`,
-              color: paused ? 'var(--success)' : 'var(--accent)',
+              border: `1px solid ${paused ? 'var(--success)' : 'var(--brand-accent)'}`,
+              color: paused ? 'var(--success)' : 'var(--brand-accent)',
             }}
           >
             {paused ? (
@@ -277,9 +277,9 @@ export default function EventsPage() {
               onClick={() => setActiveCategory(cat)}
               className="px-3 py-1 data-mono text-xs transition-colors"
               style={{
-                border: `1px solid ${activeCategory === cat ? 'var(--accent)' : 'var(--border-strong)'}`,
-                color: activeCategory === cat ? 'var(--accent)' : 'var(--fg-muted)',
-                background: activeCategory === cat ? 'var(--accent-glow)' : 'transparent',
+                border: `1px solid ${activeCategory === cat ? 'var(--brand-accent)' : 'var(--border-strong)'}`,
+                color: activeCategory === cat ? 'var(--brand-accent)' : 'var(--fg-muted)',
+                background: activeCategory === cat ? 'var(--brand-accent-glow)' : 'transparent',
               }}
             >
               {cat.toUpperCase()}
@@ -328,7 +328,7 @@ export default function EventsPage() {
       {/* Split pane */}
       <div
         className="flex flex-1 overflow-hidden"
-        style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
+        style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
       >
         {/* Event table */}
         <div className="flex flex-col overflow-hidden" style={{ flex: selectedEvent ? '0 0 60%' : '1 1 100%' }}>
@@ -364,7 +364,7 @@ export default function EventsPage() {
                       style={{
                         height: 44,
                         borderBottom: '1px solid var(--border)',
-                        borderLeft: isSelected ? '2px solid var(--accent)' : '2px solid transparent',
+                        borderLeft: isSelected ? '2px solid var(--brand-accent)' : '2px solid transparent',
                         background: isSelected ? 'var(--bg-hover)' : undefined,
                       }}
                       onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = 'var(--bg-hover)' }}
@@ -400,7 +400,7 @@ export default function EventsPage() {
                         >
                           r
                         </button>
-                        <span className="data-mono text-xs" style={{ color: 'var(--accent)' }}>view →</span>
+                        <span className="data-mono text-xs" style={{ color: 'var(--brand-accent)' }}>view →</span>
                       </div>
                     </div>
                   </motion.div>

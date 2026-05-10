@@ -27,7 +27,7 @@ export default function StoresPage() {
             key={store.id}
             href={`/stores/${store.id}`}
             className="flex flex-col p-4 transition-colors"
-            style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
+            style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'var(--bg-hover)'
               e.currentTarget.style.borderColor = 'var(--border-strong)'

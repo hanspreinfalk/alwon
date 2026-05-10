@@ -41,7 +41,7 @@ export default function CheckoutPage() {
       {/* Metric tiles */}
       <div
         className="grid grid-cols-1 sm:grid-cols-3"
-        style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
+        style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
       >
         {[
           { label: 'WALK-OUTS', value: walkouts, sub: 'unassisted exits' },
@@ -63,7 +63,7 @@ export default function CheckoutPage() {
       </div>
 
       {/* Flow visualization */}
-      <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+      <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
         <div className="px-4 pt-4">
           <SectionHeader number="01" title="ROUTING FLOW" />
         </div>
@@ -85,7 +85,7 @@ export default function CheckoutPage() {
           {/* Routes */}
           <div className="flex flex-col gap-3">
             {[
-              { label: 'WALK-OUT', count: routeCounts['walk-out'], color: 'var(--accent)' },
+              { label: 'WALK-OUT', count: routeCounts['walk-out'], color: 'var(--brand-accent)' },
               { label: 'KIOSK', count: routeCounts['kiosk'], color: 'var(--success)' },
               { label: 'ASSISTED', count: routeCounts['assisted'], color: 'var(--warning)' },
             ].map((route) => (
@@ -95,7 +95,7 @@ export default function CheckoutPage() {
                   className="px-3 py-1.5"
                   style={{
                     border: `1px solid ${route.color}`,
-                    background: `rgba(${route.color === 'var(--accent)' ? '6,144,252' : route.color === 'var(--success)' ? '74,222,128' : '251,191,36'},0.05)`,
+                    background: `rgba(${route.color === 'var(--brand-accent)' ? '6,144,252' : route.color === 'var(--success)' ? '74,222,128' : '251,191,36'},0.05)`,
                     minWidth: 120,
                   }}
                 >
@@ -126,7 +126,7 @@ export default function CheckoutPage() {
       </div>
 
       {/* Session table */}
-      <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+      <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
         <div className="px-4 pt-4">
           <SectionHeader number="02" title="LIVE SESSIONS" />
         </div>
@@ -159,7 +159,7 @@ export default function CheckoutPage() {
                 <span style={{
                   fontSize: 7,
                   color: session.status === 'completed' ? 'var(--success)'
-                    : session.status === 'in-progress' ? 'var(--accent)'
+                    : session.status === 'in-progress' ? 'var(--brand-accent)'
                     : 'var(--fg-dim)',
                 }}>●</span>
                 <span className="data-mono text-xs" style={{ color: 'var(--fg-muted)' }}>{session.status}</span>

@@ -82,9 +82,9 @@ function ConversationThread({ conv, onSend }: { conv: WhatsAppConversation; onSe
           <button
             onClick={handleSend}
             className="px-3 flex items-center justify-center transition-colors"
-            style={{ background: 'var(--accent)', color: '#fff' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--accent-hover)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--accent)' }}
+            style={{ background: 'var(--brand-accent)', color: '#fff' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--brand-accent-hover)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--brand-accent)' }}
           >
             <Send size={14} />
           </button>
@@ -110,7 +110,7 @@ export default function WhatsAppPage() {
 
       <div
         className="flex overflow-hidden"
-        style={{ border: '1px solid var(--border)', height: 600 }}
+        style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', height: 600, overflow: 'hidden' }}
       >
         {/* Thread list */}
         <div
@@ -125,7 +125,7 @@ export default function WhatsAppPage() {
               style={{
                 borderBottom: '1px solid var(--border)',
                 background: selected?.id === conv.id ? 'var(--bg-hover)' : 'transparent',
-                borderLeft: selected?.id === conv.id ? '2px solid var(--accent)' : '2px solid transparent',
+                borderLeft: selected?.id === conv.id ? '2px solid var(--brand-accent)' : '2px solid transparent',
               }}
               onMouseEnter={(e) => {
                 if (selected?.id !== conv.id) e.currentTarget.style.background = 'var(--bg-hover)'
@@ -140,7 +140,7 @@ export default function WhatsAppPage() {
                   {conv.unreadCount > 0 && (
                     <span
                       className="data-mono text-xs px-1.5 py-0.5 rounded-full"
-                      style={{ background: 'var(--accent)', color: '#fff', fontSize: 9 }}
+                      style={{ background: 'var(--brand-accent)', color: '#fff', fontSize: 9 }}
                     >
                       {conv.unreadCount}
                     </span>

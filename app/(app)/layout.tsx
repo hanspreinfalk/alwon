@@ -7,11 +7,15 @@ import { Toaster } from '@/components/ui/sonner'
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: 'var(--bg)' }}>
-      {/* Sidebar */}
-      <AppSidebar />
+      {/* Desktop sidebar */}
+      <AppSidebar
+        collapsed={sidebarCollapsed}
+        onToggle={() => setSidebarCollapsed((v) => !v)}
+      />
 
       {/* Mobile sidebar drawer */}
       {mobileSidebarOpen && (
@@ -22,7 +26,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             onClick={() => setMobileSidebarOpen(false)}
           />
           <div className="absolute left-0 top-0 h-full" style={{ zIndex: 51 }}>
-            <AppSidebar />
+            <AppSidebar
+              collapsed={false}
+              onToggle={() => setMobileSidebarOpen(false)}
+            />
           </div>
         </div>
       )}

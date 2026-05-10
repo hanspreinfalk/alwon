@@ -30,7 +30,7 @@ export default function PaymentsPage() {
       {/* Stats */}
       <div
         className="grid grid-cols-2 sm:grid-cols-4"
-        style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
+        style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
       >
         {[
           { label: 'SUCCESS RATE', value: `${successRate}%`, color: 'var(--success)' },
@@ -50,7 +50,7 @@ export default function PaymentsPage() {
       </div>
 
       {/* Success rate chart */}
-      <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+      <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
         <div className="px-4 pt-4">
           <SectionHeader number="01" title="SUCCESS RATE — LAST 15H" />
         </div>
@@ -84,10 +84,10 @@ export default function PaymentsPage() {
               <Line
                 type="monotone"
                 dataKey="rate"
-                stroke="var(--accent)"
+                stroke="var(--brand-accent)"
                 strokeWidth={1.5}
                 dot={false}
-                activeDot={{ r: 3, fill: 'var(--accent)' }}
+                activeDot={{ r: 3, fill: 'var(--brand-accent)' }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -95,7 +95,7 @@ export default function PaymentsPage() {
       </div>
 
       {/* PSP routing */}
-      <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+      <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
         <div className="px-4 pt-4">
           <SectionHeader number="02" title="PSP ROUTING" />
         </div>
@@ -108,7 +108,7 @@ export default function PaymentsPage() {
                 <div className="flex-1" style={{ height: 8, background: 'var(--bg-elevated)' }}>
                   <div
                     className="h-full transition-all"
-                    style={{ width: `${pct * 100}%`, background: 'var(--accent)', opacity: 0.7 }}
+                    style={{ width: `${pct * 100}%`, background: 'var(--brand-accent)', opacity: 0.7 }}
                   />
                 </div>
                 <span className="data-mono text-xs w-16 text-right" style={{ color: 'var(--fg-muted)' }}>
@@ -126,7 +126,7 @@ export default function PaymentsPage() {
       </div>
 
       {/* Recent transactions */}
-      <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+      <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
         <div className="px-4 pt-4">
           <SectionHeader number="03" title="RECENT TRANSACTIONS" />
         </div>

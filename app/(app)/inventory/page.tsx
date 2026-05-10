@@ -152,7 +152,7 @@ function TableView({ skus, search }: { skus: SKU[]; search: string }) {
   )
 
   return (
-    <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+    <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
       <table className="w-full text-xs">
         <thead>
           <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg)' }}>
@@ -174,7 +174,7 @@ function TableView({ skus, search }: { skus: SKU[]; search: string }) {
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
             >
               <td className="px-4">
-                <Link href={`/inventory/${sku.id}`} className="data-mono text-xs" style={{ color: 'var(--accent)' }}>
+                <Link href={`/inventory/${sku.id}`} className="data-mono text-xs" style={{ color: 'var(--brand-accent)' }}>
                   {sku.id}
                 </Link>
               </td>

@@ -50,7 +50,7 @@ export function EventRow({ event, isSelected, onClick, flash }: EventRowProps) {
       } ${isSelected ? '' : 'hover:bg-[var(--bg-hover)]'}`}
       style={{
         height: 44,
-        borderLeft: isSelected ? `2px solid var(--accent)` : '2px solid transparent',
+        borderLeft: isSelected ? `2px solid var(--brand-accent)` : '2px solid transparent',
         backgroundColor: isSelected ? 'var(--bg-hover)' : undefined,
       }}
     >
@@ -88,7 +88,7 @@ export function EventRow({ event, isSelected, onClick, flash }: EventRowProps) {
         href={`/events/${event.id}`}
         onClick={(e) => e.stopPropagation()}
         className="data-mono text-xs shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-        style={{ color: 'var(--accent)', width: 88, textAlign: 'right' }}
+        style={{ color: 'var(--brand-accent)', width: 88, textAlign: 'right' }}
       >
         {action}
       </Link>

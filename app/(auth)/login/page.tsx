@@ -9,13 +9,13 @@ function AlwonLogo() {
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
         <polygon
           points="12,2 22,20 2,20"
-          stroke="var(--accent)"
+          stroke="var(--brand-accent)"
           strokeWidth="1.5"
           fill="none"
           strokeLinejoin="round"
         />
-        <line x1="12" y1="8" x2="12" y2="15" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="12" cy="17.5" r="0.75" fill="var(--accent)" />
+        <line x1="12" y1="8" x2="12" y2="15" stroke="var(--brand-accent)" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="12" cy="17.5" r="0.75" fill="var(--brand-accent)" />
       </svg>
       <span
         className="font-semibold text-base"
@@ -45,6 +45,7 @@ export default function LoginPage() {
       <div
         className="w-full max-w-sm"
         style={{
+          borderRadius: 'var(--radius)',
           background: 'var(--bg-panel)',
           border: '1px solid var(--border-strong)',
           padding: '2.5rem',
@@ -77,7 +78,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="operator@alwon.io"
-              className="w-full px-3 py-2 text-sm rounded-sm outline-none transition-colors"
+              className="w-full px-3 py-2 text-sm rounded-md outline-none transition-colors"
               style={{
                 background: 'var(--bg-elevated)',
                 border: '1px solid var(--border-strong)',
@@ -95,7 +96,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full px-3 py-2 text-sm rounded-sm outline-none transition-colors"
+              className="w-full px-3 py-2 text-sm rounded-md outline-none transition-colors"
               style={{
                 background: 'var(--bg-elevated)',
                 border: '1px solid var(--border-strong)',
@@ -108,13 +109,13 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full py-2.5 data-mono text-sm font-medium tracking-widest transition-colors mt-1"
+            className="w-full py-2.5 data-mono text-sm font-medium tracking-widest transition-colors mt-1 rounded-md"
             style={{
-              background: 'var(--accent)',
+              background: 'var(--brand-accent)',
               color: '#fff',
             }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--accent-hover)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--accent)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--brand-accent-hover)' }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--brand-accent)' }}
           >
             CONTINUE →
           </button>
@@ -123,7 +124,7 @@ export default function LoginPage() {
         <div className="flex flex-col gap-3 mt-5">
           <button
             type="button"
-            className="w-full py-2 data-mono text-xs tracking-widest transition-colors"
+            className="w-full py-2 data-mono text-xs tracking-widest transition-colors rounded-md"
             style={{
               border: '1px solid var(--border-strong)',
               color: 'var(--fg-muted)',
@@ -140,7 +141,7 @@ export default function LoginPage() {
               type="button"
               className="text-xs"
               style={{ color: 'var(--fg-dim)' }}
-              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--accent)' }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--brand-accent)' }}
               onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--fg-dim)' }}
             >
               Reset password

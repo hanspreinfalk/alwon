@@ -28,7 +28,7 @@ function Sparkline({ data }: { data: number[] }) {
       <polyline
         points={pts.join(' ')}
         fill="none"
-        stroke="var(--accent)"
+        stroke="var(--brand-accent)"
         strokeWidth={1.5}
         strokeLinejoin="round"
         strokeLinecap="round"

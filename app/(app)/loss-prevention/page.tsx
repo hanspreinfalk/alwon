@@ -19,7 +19,7 @@ function IncidentCard({ incident }: { incident: FlaggedIncident }) {
   return (
     <div
       className="flex gap-4 p-4 transition-colors"
-      style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
+      style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--border-strong)' }}
       onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)' }}
     >
@@ -92,7 +92,7 @@ function RulesTab() {
   }
 
   return (
-    <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+    <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-2" style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg)' }}>
         <span className="section-label flex-1">RULE</span>
@@ -120,7 +120,7 @@ function RulesTab() {
               style={{
                 width: 32,
                 height: 16,
-                background: rule.enabled ? 'var(--accent)' : 'var(--bg-elevated)',
+                background: rule.enabled ? 'var(--brand-accent)' : 'var(--bg-elevated)',
                 border: '1px solid var(--border-strong)',
               }}
             >
@@ -163,7 +163,7 @@ export default function LossPreventionPage() {
       {/* Stats row */}
       <div
         className="flex flex-wrap gap-0"
-        style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
+        style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
       >
         {[
           { label: 'OPEN INCIDENTS', value: '247', sub: 'awaiting review' },
@@ -192,7 +192,7 @@ export default function LossPreventionPage() {
             className="px-4 py-2.5 data-mono text-xs transition-colors"
             style={{
               color: activeTab === tab.id ? 'var(--fg)' : 'var(--fg-muted)',
-              borderBottom: activeTab === tab.id ? '2px solid var(--accent)' : '2px solid transparent',
+              borderBottom: activeTab === tab.id ? '2px solid var(--brand-accent)' : '2px solid transparent',
               marginBottom: -1,
             }}
           >

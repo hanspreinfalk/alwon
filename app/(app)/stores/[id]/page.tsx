@@ -44,7 +44,7 @@ export default function StoreDetailPage({ params }: { params: Promise<{ id: stri
       {/* Store info */}
       <div
         className="grid grid-cols-2 sm:grid-cols-4"
-        style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
+        style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
       >
         {[
           { label: 'EVENTS / HOUR', value: store.eventsPerHour },
@@ -65,7 +65,7 @@ export default function StoreDetailPage({ params }: { params: Promise<{ id: stri
 
       {/* Store details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+        <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
           <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
             <p className="section-label">STORE INFO</p>
           </div>
@@ -92,7 +92,7 @@ export default function StoreDetailPage({ params }: { params: Promise<{ id: stri
         {/* Map placeholder */}
         <div
           className="flex flex-col items-center justify-center"
-          style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)', minHeight: 200 }}
+          style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)', minHeight: 200 }}
         >
           <MapPin size={24} style={{ color: 'var(--fg-dim)', marginBottom: 8 }} />
           <p className="section-label">MAP PLACEHOLDER</p>
@@ -101,7 +101,7 @@ export default function StoreDetailPage({ params }: { params: Promise<{ id: stri
       </div>
 
       {/* Live events scoped to store */}
-      <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+      <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
         <div className="px-4 pt-4">
           <SectionHeader
             number="01"

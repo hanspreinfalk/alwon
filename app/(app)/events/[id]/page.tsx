@@ -28,7 +28,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         {/* Left */}
         <div className="flex flex-col gap-4">
           {/* Video */}
-          <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+          <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
             <div
               className="relative"
               style={{ aspectRatio: '16/9', background: '#000' }}
@@ -38,7 +38,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                   className="flex items-center justify-center rounded-full cursor-pointer"
                   style={{ width: 52, height: 52, background: 'rgba(6,144,252,0.15)', border: '1px solid var(--border-accent)' }}
                 >
-                  <Play size={18} style={{ color: 'var(--accent)', marginLeft: 2 }} />
+                  <Play size={18} style={{ color: 'var(--brand-accent)', marginLeft: 2 }} />
                 </div>
                 <p className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>{event.source} · {event.store}</p>
               </div>
@@ -48,10 +48,10 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
               >
                 <span className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>00:00</span>
                 <div className="flex-1 h-px relative" style={{ background: 'var(--border-strong)' }}>
-                  <div className="h-full w-2/5" style={{ background: 'var(--accent)' }} />
+                  <div className="h-full w-2/5" style={{ background: 'var(--brand-accent)' }} />
                   <div
                     className="absolute top-1/2 -translate-y-1/2"
-                    style={{ left: '40%', width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)', marginLeft: -4 }}
+                    style={{ left: '40%', width: 8, height: 8, borderRadius: '50%', background: 'var(--brand-accent)', marginLeft: -4 }}
                   />
                 </div>
                 <span className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>02:14</span>
@@ -94,7 +94,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         {/* Right */}
         <div className="flex flex-col gap-4">
           {/* Metadata */}
-          <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+          <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
             <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
               <h2 className="text-lg font-semibold" style={{ color: 'var(--fg)' }}>{event.type}</h2>
               <p className="data-mono text-xs mt-0.5" style={{ color: 'var(--fg-dim)' }}>
@@ -121,7 +121,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           </div>
 
           {/* Comments */}
-          <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+          <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
             <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
               <p className="section-label">COMMENTS</p>
             </div>

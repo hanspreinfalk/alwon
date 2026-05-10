@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { Bell, Search, Menu } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { Bell, Search, Menu, Monitor, Sun, Moon, LogOut, Settings, User, ChevronDown } from 'lucide-react'
 import { LiveClock } from './live-clock'
 import {
   CommandDialog,
@@ -12,6 +13,17 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+} from '@/components/ui/dropdown-menu'
 
 const ROUTES = [
   { label: 'Dashboard', href: '/dashboard' },
@@ -22,6 +34,7 @@ const ROUTES = [
   { label: 'Payments', href: '/payments' },
   { label: 'WhatsApp', href: '/whatsapp' },
   { label: 'Stores', href: '/stores' },
+  { label: 'AI Assistant', href: '/chat' },
   { label: 'Settings', href: '/settings' },
 ]
 
@@ -34,6 +47,7 @@ const PATH_LABELS: Record<string, string> = {
   '/payments': 'PAYMENTS',
   '/whatsapp': 'WHATSAPP',
   '/stores': 'STORES',
+  '/chat': 'AI ASSISTANT',
   '/settings': 'SETTINGS',
 }
 
@@ -56,7 +70,137 @@ function Breadcrumb() {
   )
 }
 
-export function Topbar({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void }) {
+function UserMenu() {
+  const { theme, setTheme } = useTheme()
+  const router = useRouter()
+
+  const themeOptions = [
+    { label: 'System', value: 'system', icon: Monitor },
+    { label: 'Light', value: 'light', icon: Sun },
+    { label: 'Dark', value: 'dark', icon: Moon },
+  ]
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className="flex items-center gap-2 rounded-sm transition-colors px-1 py-0.5 outline-none"
+          style={{ color: 'var(--fg-muted)' }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--fg)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--fg-muted)' }}
+        >
+          <div
+            className="flex items-center justify-center rounded-full text-xs font-medium shrink-0"
+            style={{
+              width: 28,
+              height: 28,
+              background: 'var(--bg-panel)',
+              color: 'var(--fg)',
+              border: '1px solid var(--border-strong)',
+            }}
+          >
+            E
+          </div>
+          <ChevronDown size={12} className="hidden sm:block" />
+        </button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent
+        align="end"
+        className="w-52"
+        style={{
+          background: 'var(--bg-elevated)',
+          border: '1px solid var(--border-strong)',
+          borderRadius: '2px',
+        }}
+      >
+        <DropdownMenuLabel style={{ color: 'var(--fg-dim)' }}>
+          <div className="flex flex-col">
+            <span className="text-xs font-medium" style={{ color: 'var(--fg)' }}>Elena Martinez</span>
+            <span className="section-label" style={{ fontSize: '0.6rem' }}>Store Manager · LIMA-03</span>
+          </div>
+        </DropdownMenuLabel>
+
+        <DropdownMenuSeparator style={{ background: 'var(--border)' }} />
+
+        <DropdownMenuItem
+          onClick={() => router.push('/settings')}
+          className="gap-2 cursor-pointer data-mono text-xs"
+          style={{ color: 'var(--fg-muted)' }}
+        >
+          <User size={13} />
+          Profile &amp; Account
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          onClick={() => router.push('/settings')}
+          className="gap-2 cursor-pointer data-mono text-xs"
+          style={{ color: 'var(--fg-muted)' }}
+        >
+          <Settings size={13} />
+          Settings
+        </DropdownMenuItem>
+
+        <DropdownMenuSeparator style={{ background: 'var(--border)' }} />
+
+        {/* Theme sub-menu */}
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger
+            className="gap-2 data-mono text-xs"
+            style={{ color: 'var(--fg-muted)' }}
+          >
+            {theme === 'light' ? <Sun size={13} /> : theme === 'dark' ? <Moon size={13} /> : <Monitor size={13} />}
+            Theme
+            <span className="ml-auto section-label" style={{ fontSize: '0.6rem', color: 'var(--fg-dim)' }}>
+              {theme ?? 'system'}
+            </span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent
+            style={{
+              background: 'var(--bg-elevated)',
+              border: '1px solid var(--border-strong)',
+              borderRadius: '2px',
+            }}
+          >
+            {themeOptions.map(({ label, value, icon: Icon }) => (
+              <DropdownMenuItem
+                key={value}
+                onClick={() => setTheme(value)}
+                className="gap-2 cursor-pointer data-mono text-xs"
+                style={{
+                  color: theme === value ? 'var(--brand-accent)' : 'var(--fg-muted)',
+                  background: theme === value ? 'var(--brand-accent-glow)' : undefined,
+                }}
+              >
+                <Icon size={13} />
+                {label}
+                {theme === value && (
+                  <span className="ml-auto" style={{ color: 'var(--brand-accent)', fontSize: 8 }}>●</span>
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+
+        <DropdownMenuSeparator style={{ background: 'var(--border)' }} />
+
+        <DropdownMenuItem
+          onClick={() => router.push('/login')}
+          className="gap-2 cursor-pointer data-mono text-xs"
+          style={{ color: 'var(--danger)' }}
+        >
+          <LogOut size={13} />
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+export function Topbar({ onMobileMenuToggle, onSidebarToggle }: {
+  onMobileMenuToggle?: () => void
+  onSidebarToggle?: () => void
+}) {
   const [cmdOpen, setCmdOpen] = useState(false)
   const router = useRouter()
 
@@ -78,14 +222,14 @@ export function Topbar({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void
   return (
     <>
       <header
-        className="sticky top-0 z-40 flex items-center gap-4 px-4 md:px-6"
+        className="sticky top-0 z-40 flex items-center gap-3 px-4 md:px-5"
         style={{
           height: 56,
           background: 'var(--bg)',
           borderBottom: '1px solid var(--border)',
         }}
       >
-        {/* Mobile menu */}
+        {/* Mobile menu toggle */}
         <button
           onClick={onMobileMenuToggle}
           className="md:hidden p-1"
@@ -102,57 +246,42 @@ export function Topbar({ onMobileMenuToggle }: { onMobileMenuToggle?: () => void
         {/* Command palette trigger */}
         <button
           onClick={() => setCmdOpen(true)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-sm transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 transition-colors rounded-md"
           style={{
             background: 'var(--bg-elevated)',
             border: '1px solid var(--border)',
             color: 'var(--fg-dim)',
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border-strong)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = 'var(--border)'
-          }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--border-strong)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)' }}
         >
           <Search size={13} />
-          <span className="data-mono text-xs hidden sm:block">Search events, SKUs, cameras...</span>
+          <span className="data-mono text-xs hidden sm:block">Search...</span>
           <kbd
-            className="data-mono text-xs hidden md:block px-1 py-0.5 rounded"
-            style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-strong)' }}
+            className="data-mono text-xs hidden md:block px-1 py-0.5"
+            style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-strong)', fontSize: '0.65rem' }}
           >
             ⌘K
           </kbd>
         </button>
 
         {/* Right side */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <LiveClock />
 
           {/* Notifications */}
           <button className="relative p-1" style={{ color: 'var(--fg-dim)' }}>
             <Bell size={16} strokeWidth={1.5} />
             <span
-              className="absolute -top-0.5 -right-0.5 flex items-center justify-center data-mono text-xs rounded-full"
+              className="absolute -top-0.5 -right-0.5 flex items-center justify-center data-mono rounded-full"
               style={{ width: 14, height: 14, background: 'var(--danger)', color: '#fff', fontSize: 9 }}
             >
               3
             </span>
           </button>
 
-          {/* User avatar */}
-          <div
-            className="flex items-center justify-center rounded-full text-xs font-medium cursor-pointer"
-            style={{
-              width: 28,
-              height: 28,
-              background: 'var(--bg-panel)',
-              color: 'var(--fg)',
-              border: '1px solid var(--border-strong)',
-            }}
-          >
-            E
-          </div>
+          {/* User dropdown */}
+          <UserMenu />
         </div>
       </header>
 
