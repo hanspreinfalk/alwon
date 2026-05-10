@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import Script from 'next/script'
 import { ThemeProvider } from '@/components/theme-provider'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import './globals.css'
@@ -19,9 +20,6 @@ export const metadata: Metadata = {
   description: 'Retail Automation OS — Operator Console',
 }
 
-/** Runs before paint — avoids FOUC; ThemeProvider syncs on the client without injecting `<script>` in React (React 19). */
-const themeBootScript = `(function(){try{var d=document.documentElement;var k='theme';var s=localStorage.getItem(k)||'dark';var r;if(s==='system'){r=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}else{r=s==='dark'?'dark':'light';}d.classList.toggle('dark',r==='dark');}catch(e){}})();`
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
@@ -30,8 +28,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${geistSans.variable} ${geistMono.variable} h-full`}
     >
       <head>
-        {/* Runs before paint on every navigation — avoids FOUC without putting a <script> in the client React tree (React 19). */}
-        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
+        {/* beforeInteractive runs before hydration, outside React's reconciler — avoids FOUC and the React 19 script-in-component warning */}
+        <Script id="theme-boot" strategy="beforeInteractive">{`(function(){try{var d=document.documentElement;var s=localStorage.getItem('theme')||'dark';var r;if(s==='system'){r=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}else{r=s==='dark'?'dark':'light';}d.classList.toggle('dark',r==='dark');}catch(e){}})();`}</Script>
       </head>
       <body suppressHydrationWarning className="h-full antialiased">
         <ThemeProvider

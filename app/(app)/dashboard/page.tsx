@@ -570,7 +570,7 @@ export default function DashboardPage() {
             {flaggedEvents.map((item) => (
               <Link
                 key={item.id}
-                href={`/events/${item.id}`}
+                href="/events"
                 className="flex min-h-[52px] items-center gap-2 border-b px-3 py-2.5 transition-colors hover:bg-muted/50 sm:gap-3 sm:px-4"
               >
                 <div className="flex size-8 shrink-0 items-center justify-center rounded-md border border-destructive/15 bg-destructive/8 text-destructive">

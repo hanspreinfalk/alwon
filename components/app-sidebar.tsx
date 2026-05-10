@@ -61,7 +61,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/events', icon: Radio, label: 'Activity' },
       { href: '/loss-prevention', icon: ShieldAlert, label: 'Security', badge: 12 },
       { href: '/checkout', icon: ShoppingCart, label: 'Checkout' },
-      { href: '/inventory', icon: Package, label: 'Stock' },
+      { href: '/inventory', icon: Package, label: 'Stock', badge: 3 },
     ],
   },
   {

@@ -106,11 +106,8 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full py-2.5 text-sm font-medium transition-colors mt-1 rounded-md"
-            style={{
-              background: 'var(--brand-accent)',
-              color: '#fff',
-            }}
+            className="mt-1 w-full rounded-md py-2.5 text-sm font-medium text-white transition-colors dark:text-black"
+            style={{ background: 'var(--brand-accent)' }}
             onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--brand-accent-hover)' }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--brand-accent)' }}
           >
