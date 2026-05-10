@@ -13,17 +13,31 @@ import type {
 
 // --- helpers ---
 
+// Seeded PRNG (mulberry32) so SSR and client produce identical mock data,
+// preventing React hydration mismatches.
+function mulberry32(seed: number) {
+  return function () {
+    seed |= 0
+    seed = (seed + 0x6d2b79f5) | 0
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+const _rng = mulberry32(0xdeadbeef)
+
 let _id = 1000
 export function nextId(): string {
   return `evt-${(++_id).toString().padStart(6, '0')}`
 }
 
 function pick<T>(arr: T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)]
+  return arr[Math.floor(_rng() * arr.length)]
 }
 
 function rand(min: number, max: number): number {
-  return Math.random() * (max - min) + min
+  return _rng() * (max - min) + min
 }
 
 function randInt(min: number, max: number): number {

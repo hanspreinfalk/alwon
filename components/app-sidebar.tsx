@@ -69,13 +69,13 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: '/payments', icon: CreditCard, label: 'Payments' },
       { href: '/whatsapp', icon: MessageSquare, label: 'Messages', badge: 4 },
-      { href: '/stores', icon: Store, label: 'My stores' },
       { href: '/chat', icon: Bot, label: 'Ask AI' },
     ],
   },
   {
     label: 'Setup',
     items: [
+      { href: '/stores', icon: Store, label: 'My stores' },
       { href: '/settings', icon: Settings, label: 'Settings' },
     ],
   },
