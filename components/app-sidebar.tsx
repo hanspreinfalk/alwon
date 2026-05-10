@@ -83,22 +83,12 @@ const NAV_GROUPS: NavGroup[] = [
 
 function AlwonMark() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <polygon
-        points="12,2 22,20 2,20"
-        stroke="var(--brand-accent)"
-        strokeWidth="1.8"
-        fill="none"
-        strokeLinejoin="round"
-      />
-      <line
-        x1="12" y1="8" x2="12" y2="15"
-        stroke="var(--brand-accent)"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <circle cx="12" cy="17.5" r="0.9" fill="var(--brand-accent)" />
-    </svg>
+    <span
+      className="select-none text-[15px] font-bold leading-none tracking-tight text-blue-600 dark:text-blue-400"
+      aria-hidden="true"
+    >
+      A
+    </span>
   )
 }
 
@@ -219,10 +209,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader className="border-b border-sidebar-border gap-0 p-0">
         {/* Logo row — h-[52px] matches topbar height so borders align when collapsed */}
         <div className="flex h-[52px] items-center gap-2.5 px-3">
-          <div
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
-            style={{ background: 'var(--brand-accent-glow)', border: '1px solid var(--border-accent)' }}
-          >
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-blue-500/10 ring-1 ring-blue-500/25 dark:bg-blue-400/10 dark:ring-blue-400/25">
             <AlwonMark />
           </div>
           <span className="truncate font-semibold text-[13px] text-sidebar-foreground group-data-[collapsible=icon]:hidden">

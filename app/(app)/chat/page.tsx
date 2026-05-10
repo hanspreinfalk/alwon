@@ -3,13 +3,11 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { format } from 'date-fns'
-import { Send, RotateCcw, Sparkles, Bot, User } from 'lucide-react'
+import { Send, RotateCcw, Bot, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { generateAIResponse, type ChatMessage } from '@/lib/ai-responses'
 import { getDashboardMetrics, generateStores, generateFlaggedIncidents } from '@/lib/mock-data'
 
@@ -170,8 +168,6 @@ export default function ChatPage() {
     setMessages([INITIAL_MESSAGE])
   }
 
-  const openIncidents = incidents.filter(i => i.status === 'open').length
-
   return (
     <div className="flex flex-col" style={{ height: 'calc(100vh - 52px - 48px)' }}>
       {/* Header */}
@@ -189,156 +185,79 @@ export default function ChatPage() {
       </div>
 
       {/* Main container */}
-      <div className="flex flex-1 overflow-hidden rounded-lg border border-border bg-card">
-        {/* Chat area */}
-        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-          {/* Messages */}
-          <ScrollArea className="flex-1 px-5 py-5">
-            <div className="flex flex-col gap-5">
-              <AnimatePresence initial={false}>
-                {messages.map((msg) => (
-                  <MessageBubble key={msg.id} msg={msg} />
-                ))}
-              </AnimatePresence>
+      <div className="flex flex-1 flex-col overflow-hidden rounded-lg border border-border bg-card">
+        {/* Messages */}
+        <ScrollArea className="flex-1 px-5 py-5">
+          <div className="flex flex-col gap-5">
+            <AnimatePresence initial={false}>
+              {messages.map((msg) => (
+                <MessageBubble key={msg.id} msg={msg} />
+              ))}
+            </AnimatePresence>
 
-              <AnimatePresence>
-                {isTyping && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    className="flex gap-3"
-                  >
-                    <Avatar size="sm" className="mt-0.5 shrink-0">
-                      <AvatarFallback className="bg-primary/10 text-primary">
-                        <Bot className="size-3" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="rounded-lg px-3.5 py-2.5 bg-muted flex items-center">
-                      <TypingIndicator />
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            <AnimatePresence>
+              {isTyping && (
+                <motion.div
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="flex gap-3"
+                >
+                  <Avatar size="sm" className="mt-0.5 shrink-0">
+                    <AvatarFallback className="bg-primary/10 text-primary">
+                      <Bot className="size-3" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="rounded-lg px-3.5 py-2.5 bg-muted flex items-center">
+                    <TypingIndicator />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-              <div ref={messagesEndRef} />
-            </div>
-          </ScrollArea>
+            <div ref={messagesEndRef} />
+          </div>
+        </ScrollArea>
 
-          <Separator />
-
-          {/* Input area */}
-          <div className="shrink-0 px-4 py-3">
-            {messages.length === 1 && (
-              <div className="flex flex-wrap gap-1.5 mb-3">
-                {SUGGESTED_PROMPTS.slice(0, 4).map((prompt) => (
-                  <button
-                    key={prompt}
-                    onClick={() => sendMessage(prompt)}
-                    className="px-2.5 py-1 text-xs rounded-md border border-border bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border transition-colors"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="flex gap-2">
-              <Input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask about stores, inventory, loss prevention, payments…"
+        {/* Suggestions + input */}
+        <div className="shrink-0 border-t border-border bg-card px-4 pb-3 pt-3">
+          <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+            Try asking
+          </p>
+          <div className="mb-3 flex max-h-28 flex-wrap gap-1.5 overflow-y-auto overscroll-contain sm:max-h-none">
+            {SUGGESTED_PROMPTS.map((prompt) => (
+              <button
+                key={prompt}
+                type="button"
+                onClick={() => sendMessage(prompt)}
                 disabled={isTyping}
-                className="h-9 flex-1"
-              />
-              <Button
-                type="submit"
-                size="sm"
-                disabled={!input.trim() || isTyping}
-                className="h-9 gap-1.5 px-3"
+                className="rounded-md border border-border bg-muted/50 px-2.5 py-1.5 text-left text-xs text-muted-foreground transition-colors hover:border-border hover:bg-muted hover:text-foreground disabled:pointer-events-none disabled:opacity-50"
               >
-                <Send className="size-3.5" />
-                <span className="hidden sm:inline">Send</span>
-              </Button>
-            </form>
+                {prompt}
+              </button>
+            ))}
           </div>
-        </div>
 
-        {/* Right sidebar */}
-        <div className="hidden lg:flex flex-col shrink-0 w-56 border-l border-border overflow-hidden">
-          <div className="px-4 py-3 flex items-center gap-2">
-            <Sparkles className="size-3.5 text-muted-foreground" />
-            <span className="text-sm font-medium">Context</span>
-          </div>
-          <Separator />
-
-          <ScrollArea className="flex-1">
-            {/* System stats */}
-            <div className="px-4 py-3">
-              <p className="text-xs font-medium text-muted-foreground mb-2">System status</p>
-              <div className="space-y-1">
-                {[
-                  { label: 'Events today', value: metrics.eventsProcessed.toLocaleString() },
-                  { label: 'Open incidents', value: String(openIncidents) },
-                  { label: 'Cameras online', value: `${metrics.activeCameras}/${metrics.totalCameras}` },
-                  { label: 'Payment rate', value: `${metrics.paymentSuccessRate}%` },
-                  { label: 'Shrink prevented', value: `$${metrics.shrinkPrevented.toLocaleString()}` },
-                ].map(({ label, value }) => (
-                  <div key={label} className="flex items-center justify-between py-1.5 border-b border-border last:border-0">
-                    <span className="text-xs text-muted-foreground">{label}</span>
-                    <span className="text-xs font-medium tabular-nums">{value}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Stores */}
-            <div className="px-4 py-3">
-              <p className="text-xs font-medium text-muted-foreground mb-2">Stores</p>
-              <div className="space-y-1">
-                {stores.slice(0, 6).map((store) => (
-                  <div key={store.id} className="flex items-center gap-2 py-1.5 border-b border-border last:border-0">
-                    <span className={`size-1.5 rounded-full shrink-0 ${
-                      store.status === 'online' ? 'bg-green-500' :
-                      store.status === 'degraded' ? 'bg-yellow-500' : 'bg-red-500'
-                    }`} />
-                    <span className="text-xs text-muted-foreground flex-1 font-mono truncate">{store.id}</span>
-                    <Badge
-                      variant={store.shrinkDelta > 0 ? 'destructive' : 'secondary'}
-                      className="text-[10px] h-4 px-1.5 font-mono"
-                    >
-                      {store.shrinkDelta > 0 ? '+' : ''}{store.shrinkDelta}%
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Suggested prompts */}
-            <div className="px-4 py-3">
-              <p className="text-xs font-medium text-muted-foreground mb-2">Try asking</p>
-              <div className="flex flex-col gap-1">
-                {SUGGESTED_PROMPTS.slice(4).map((prompt) => (
-                  <button
-                    key={prompt}
-                    onClick={() => {
-                      setInput(prompt)
-                      inputRef.current?.focus()
-                    }}
-                    className="text-left text-xs px-2.5 py-2 rounded-md border border-border bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </ScrollArea>
+          <form onSubmit={handleSubmit} className="flex gap-2">
+            <Input
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask about stores, inventory, loss prevention, payments…"
+              disabled={isTyping}
+              className="h-9 flex-1"
+            />
+            <Button
+              type="submit"
+              size="sm"
+              disabled={!input.trim() || isTyping}
+              className="h-9 gap-1.5 px-3"
+            >
+              <Send className="size-3.5" />
+              <span className="hidden sm:inline">Send</span>
+            </Button>
+          </form>
         </div>
       </div>
     </div>

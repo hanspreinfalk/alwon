@@ -249,15 +249,79 @@ export function generateFlaggedIncidents(): FlaggedIncident[] {
 
 // --- payments ---
 
+const PAYMENT_PRODUCT_NAMES = [
+  'Whole milk 1L',
+  'Wheat bread loaf',
+  'Eggs 12-pack',
+  'Bananas · weighed',
+  'Ground beef 500g',
+  'Laundry detergent',
+  'Paper towels 6-roll',
+  'Sparkling water 6pk',
+  'Shampoo 400ml',
+  'AA batteries 8pk',
+  'Frozen pizza',
+  'Orange juice 2L',
+  'Diapers size 4',
+  'Cooking oil 1L',
+  'Yogurt multipack',
+  'Potato chips family',
+  'Hand soap refill',
+  'Rice 1kg',
+  'Coffee beans 250g',
+  'Salad kit',
+  'Prepared sandwich',
+  'Chocolate bar',
+  'Trash bags',
+  'Bleach 2L',
+  'Gift card reload',
+]
+
+/** Builds 2–7 basket lines whose `lineTotal` sums to `total` (within rounding). */
+function generatePaymentLineItems(total: number): PaymentTransaction['lineItems'] {
+  const n = randInt(2, 7)
+  const items: PaymentTransaction['lineItems'] = []
+  let remaining = total
+
+  for (let i = 0; i < n - 1; i++) {
+    const slicesLeft = n - i
+    const maxShare = remaining - (slicesLeft - 1) * 0.01
+    const portion = rand(0.18, 0.62)
+    let lineTotal = parseFloat((maxShare * portion).toFixed(2))
+    lineTotal = Math.min(lineTotal, Math.max(0.01, remaining - 0.01 * (slicesLeft - 1)))
+    items.push({
+      name: pick(PAYMENT_PRODUCT_NAMES),
+      sku: `${pick(['GRO', 'RTL', 'FMB', 'HPC'])}-${String(randInt(100000, 999999))}`,
+      lineTotal,
+    })
+    remaining -= lineTotal
+  }
+
+  items.push({
+    name: pick(PAYMENT_PRODUCT_NAMES),
+    sku: `${pick(['GRO', 'RTL', 'FMB', 'HPC'])}-${String(randInt(100000, 999999))}`,
+    lineTotal: parseFloat(Math.max(0.01, remaining).toFixed(2)),
+  })
+
+  const drift = total - items.reduce((s, x) => s + x.lineTotal, 0)
+  if (Math.abs(drift) >= 0.01 && items.length > 0) {
+    items[items.length - 1].lineTotal = parseFloat((items[items.length - 1].lineTotal + drift).toFixed(2))
+  }
+
+  return items
+}
+
 export function generatePaymentTransactions(): PaymentTransaction[] {
   const processors: PaymentTransaction['processor'][] = ['Stripe', 'MP', 'Prisma', 'Niubiz', 'EBANX']
   return Array.from({ length: 40 }, (_, i) => {
     const status = Math.random() < 0.04 ? 'failed' : Math.random() < 0.02 ? 'failover' : 'success'
+    const amount = parseFloat(rand(5, 350).toFixed(2))
     return {
       id: `pay-${String(i + 1).padStart(6, '0')}`,
       timestamp: subMinutes(new Date(), i * 3),
-      amount: parseFloat(rand(5, 350).toFixed(2)),
+      amount,
       currency: pick(['PEN', 'MXN', 'COP', 'CLP', 'USD']),
+      lineItems: generatePaymentLineItems(amount),
       processor: pick(processors),
       status: status as PaymentTransaction['status'],
       store: pick(STORE_IDS),
@@ -436,9 +500,10 @@ export function generateVisitorDataForDate(date: Date): number[] {
   })
 }
 
+/** One point per hour, 00:00–23:00 — full calendar day for payment success rate chart */
 export function generatePaymentTimeSeries(): { time: string; rate: number }[] {
-  return Array.from({ length: 60 }, (_, i) => ({
-    time: `${String(Math.floor(i / 4)).padStart(2, '0')}:${String((i % 4) * 15).padStart(2, '0')}`,
+  return Array.from({ length: 24 }, (_, h) => ({
+    time: `${String(h).padStart(2, '0')}:00`,
     rate: parseFloat((99 + rand(-1.5, 0.8)).toFixed(2)),
   }))
 }

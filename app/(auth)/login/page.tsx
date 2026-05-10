@@ -6,17 +6,14 @@ import { useRouter } from 'next/navigation'
 function AlwonLogo() {
   return (
     <div className="flex items-center gap-3">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-        <polygon
-          points="12,2 22,20 2,20"
-          stroke="var(--brand-accent)"
-          strokeWidth="1.5"
-          fill="none"
-          strokeLinejoin="round"
-        />
-        <line x1="12" y1="8" x2="12" y2="15" stroke="var(--brand-accent)" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="12" cy="17.5" r="0.75" fill="var(--brand-accent)" />
-      </svg>
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 ring-1 ring-blue-500/25 dark:bg-blue-400/10 dark:ring-blue-400/25">
+        <span
+          className="select-none text-2xl font-bold leading-none tracking-tight text-blue-600 dark:text-blue-400"
+          aria-hidden="true"
+        >
+          A
+        </span>
+      </div>
       <span
         className="font-semibold text-base"
         style={{ color: 'var(--fg)', letterSpacing: '0.15em' }}

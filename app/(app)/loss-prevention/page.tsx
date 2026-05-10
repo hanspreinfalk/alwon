@@ -14,9 +14,6 @@ import { friendlyEvent } from '@/lib/labels'
 import type { FlaggedIncident } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
-const incidents = generateFlaggedIncidents()
-const openIncidents = incidents.filter((i) => i.status === 'open' || i.status === 'needs-context')
-const resolvedIncidents = incidents.filter((i) => i.status === 'confirmed' || i.status === 'false-positive')
 
 const STATUS_LABELS: Record<FlaggedIncident['status'], string> = {
   open: 'Open',
@@ -308,6 +305,15 @@ function RulesTab() {
 export default function LossPreventionPage() {
   const [activeTab, setActiveTab] = useState<Tab>('queue')
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  // Initialise empty so SSR and client first-render match, then populate after mount.
+  const [incidents, setIncidents] = useState<FlaggedIncident[]>([])
+
+  useEffect(() => {
+    setIncidents(generateFlaggedIncidents())
+  }, [])
+
+  const openIncidents = incidents.filter((i) => i.status === 'open' || i.status === 'needs-context')
+  const resolvedIncidents = incidents.filter((i) => i.status === 'confirmed' || i.status === 'false-positive')
 
   useEffect(() => {
     setSelectedId(null)

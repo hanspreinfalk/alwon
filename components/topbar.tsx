@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
-import { useTheme } from 'next-themes'
+import { useTheme, type ThemeName } from '@/components/theme-provider'
 import {
   Bell, Search, Monitor, Sun, Moon, LogOut, Settings, User,
   ChevronDown, ShieldAlert, Package, Camera, CheckCheck,
@@ -204,7 +204,7 @@ function UserMenu() {
   const { theme, setTheme } = useTheme()
   const router = useRouter()
 
-  const themeOptions = [
+  const themeOptions: { label: string; value: ThemeName; icon: typeof Monitor }[] = [
     { label: 'System', value: 'system', icon: Monitor },
     { label: 'Light', value: 'light', icon: Sun },
     { label: 'Dark', value: 'dark', icon: Moon },

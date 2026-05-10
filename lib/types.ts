@@ -69,11 +69,19 @@ export interface FlaggedIncident {
   estimatedValue?: number
 }
 
+export interface PaymentLineItem {
+  name: string
+  sku: string
+  lineTotal: number
+}
+
 export interface PaymentTransaction {
   id: string
   timestamp: Date
   amount: number
   currency: string
+  /** Basket lines; totals align with `amount` */
+  lineItems: PaymentLineItem[]
   processor: 'Stripe' | 'MP' | 'Prisma' | 'Niubiz' | 'EBANX'
   status: 'success' | 'failed' | 'failover' | 'pending'
   store: string
