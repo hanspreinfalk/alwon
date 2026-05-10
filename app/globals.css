@@ -1,26 +1,210 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+
+  /* Alwon brand tokens */
+  --color-alwon-bg: #05070a;
+  --color-alwon-bg-elevated: #0a0e14;
+  --color-alwon-bg-panel: #0c1118;
+  --color-alwon-bg-hover: #11161e;
+  --color-alwon-fg: #e8edf2;
+  --color-alwon-fg-muted: #8a95a3;
+  --color-alwon-fg-dim: #4a5462;
+  --color-alwon-accent: #0690fc;
+  --color-alwon-accent-hover: #1a9eff;
+  --color-alwon-success: #4ade80;
+  --color-alwon-warning: #fbbf24;
+  --color-alwon-danger: #f87171;
 }
 
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --bg: #05070a;
+    --bg-elevated: #0a0e14;
+    --bg-panel: #0c1118;
+    --bg-hover: #11161e;
+    --fg: #e8edf2;
+    --fg-muted: #8a95a3;
+    --fg-dim: #4a5462;
+    --accent: #0690fc;
+    --accent-hover: #1a9eff;
+    --accent-glow: rgba(6, 144, 252, 0.15);
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --border: rgba(255, 255, 255, 0.06);
+    --border-strong: rgba(255, 255, 255, 0.12);
+    --border-accent: rgba(6, 144, 252, 0.4);
+
+    /* shadcn tokens mapped to Alwon palette */
+    --background: #05070a;
+    --foreground: #e8edf2;
+    --card: #0c1118;
+    --card-foreground: #e8edf2;
+    --popover: #0a0e14;
+    --popover-foreground: #e8edf2;
+    --primary: #0690fc;
+    --primary-foreground: #ffffff;
+    --secondary: #0c1118;
+    --secondary-foreground: #e8edf2;
+    --muted: #0a0e14;
+    --muted-foreground: #8a95a3;
+    --accent: #0c1118;
+    --accent-foreground: #e8edf2;
+    --destructive: #f87171;
+    --border: rgba(255, 255, 255, 0.06);
+    --input: rgba(255, 255, 255, 0.08);
+    --ring: rgba(6, 144, 252, 0.4);
+    --radius: 0.25rem;
+
+    --chart-1: #0690fc;
+    --chart-2: #4ade80;
+    --chart-3: #fbbf24;
+    --chart-4: #f87171;
+    --chart-5: #8a95a3;
+
+    --sidebar: #0a0e14;
+    --sidebar-foreground: #e8edf2;
+    --sidebar-primary: #0690fc;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #11161e;
+    --sidebar-accent-foreground: #e8edf2;
+    --sidebar-border: rgba(255, 255, 255, 0.06);
+    --sidebar-ring: rgba(6, 144, 252, 0.4);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-color: var(--bg);
+    color: var(--fg);
+  }
+  html {
+    @apply font-sans;
+    color-scheme: dark;
+  }
+}
+
+/* Live indicator pulse animation */
+@keyframes live-pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes ring-pulse {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.5);
+  }
+}
+
+@keyframes accent-flash {
+  0% { background-color: rgba(6, 144, 252, 0.15); }
+  100% { background-color: transparent; }
+}
+
+.live-dot {
+  animation: live-pulse 2s ease-in-out infinite;
+}
+
+.live-ring {
+  animation: ring-pulse 2s ease-out infinite;
+}
+
+.event-flash {
+  animation: accent-flash 0.8s ease-out forwards;
+}
+
+/* Subtle grid background for empty states */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+/* Monospace data styles */
+.data-mono {
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Section label style */
+.section-label {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.2);
 }
