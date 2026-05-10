@@ -231,12 +231,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
 
         {/* Store selector row — hidden when collapsed to icon */}
-        <div className="group-data-[collapsible=icon]:hidden flex items-center gap-1.5 px-3 pb-3">
-          <span
-            className="h-1.5 w-1.5 shrink-0 rounded-full"
-            style={{ background: 'var(--success)' }}
-            aria-hidden="true"
-          />
+        <div className="group-data-[collapsible=icon]:hidden w-full px-3 pb-3">
           <StoreSelector />
         </div>
       </SidebarHeader>

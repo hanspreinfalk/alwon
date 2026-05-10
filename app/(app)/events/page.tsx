@@ -17,6 +17,7 @@ import { friendlyEvent } from '@/lib/labels'
 import type { StoreEvent, EventType } from '@/lib/types'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
@@ -166,48 +167,51 @@ function EventDetailPanel({ event, onClose }: { event: StoreEvent; onClose: () =
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 16 }}
       transition={{ duration: 0.2 }}
-      className="flex flex-col h-full bg-card"
+      className="flex h-full min-h-0 min-w-0 flex-col bg-card"
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
+      <div className="flex shrink-0 items-start justify-between gap-3 border-b bg-muted/30 px-5 py-4">
         <div className="min-w-0">
-          <p className="text-sm font-semibold leading-tight truncate">{friendlyEvent(event.type)}</p>
-          <p className="text-xs text-muted-foreground mt-0.5 font-mono">{event.id}</p>
+          <h2 className="truncate text-lg font-semibold tracking-tight leading-tight">
+            {friendlyEvent(event.type)}
+          </h2>
+          <p className="mt-1 font-mono text-xs text-muted-foreground">{event.id}</p>
         </div>
-        <Button variant="ghost" size="icon-sm" onClick={onClose} className="shrink-0 ml-2">
+        <Button variant="ghost" size="icon-sm" onClick={onClose} className="shrink-0">
           <X />
         </Button>
       </div>
 
-      <ScrollArea className="flex-1">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
         {isCameraEvent ? (
           <CameraHealthDetail event={event} />
         ) : (
-          <div className="px-4 pt-4">
+          <div className="px-5 pt-5">
             <div
-              className="relative rounded-lg overflow-hidden border bg-black"
-              style={{ aspectRatio: '16/9' }}
+              className={cn(
+                'relative w-full overflow-hidden rounded-xl border bg-black shadow-sm',
+                'aspect-video min-h-[min(44vh,420px)]',
+              )}
             >
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                <button
-                  className="flex size-11 items-center justify-center rounded-full transition-opacity hover:opacity-80"
-                  style={{ background: 'rgba(5,119,216,0.18)', border: '1px solid var(--border-accent)' }}
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className="size-14 rounded-full shadow-md"
                   onClick={() => toast.info('Opening footage…', { description: event.source })}
                 >
-                  <Play size={16} className="ml-0.5" style={{ color: 'var(--brand-accent)' }} />
-                </button>
-                <p className="font-mono text-xs" style={{ color: 'rgba(255,255,255,0.45)' }}>{event.source}</p>
+                  <Play className="size-6 ml-0.5" />
+                </Button>
+                <p className="font-mono text-xs text-white/50">{event.source}</p>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 flex items-center gap-2 px-3 py-2 bg-black/70">
-                <span className="font-mono text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>00:00</span>
-                <div className="flex-1 h-px bg-white/15 relative">
-                  <div className="h-full w-1/3" style={{ background: 'var(--brand-accent)' }} />
-                  <div
-                    className="absolute top-1/2 -translate-y-1/2 size-2.5 rounded-full"
-                    style={{ left: '33%', marginLeft: -5, background: 'var(--brand-accent)' }}
-                  />
+              <div className="absolute bottom-0 left-0 right-0 flex items-center gap-2 border-t border-white/10 bg-black/80 px-4 py-3">
+                <span className="font-mono text-[11px] text-white/45">00:00</span>
+                <div className="relative h-1 flex-1 rounded-full bg-white/15">
+                  <div className="h-full w-1/3 rounded-full bg-primary" />
+                  <div className="absolute top-1/2 left-1/3 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-background bg-primary" />
                 </div>
-                <span className="font-mono text-[10px]" style={{ color: 'rgba(255,255,255,0.4)' }}>01:30</span>
+                <span className="font-mono text-[11px] text-white/45">01:30</span>
               </div>
             </div>
           </div>
@@ -215,100 +219,79 @@ function EventDetailPanel({ event, onClose }: { event: StoreEvent; onClose: () =
 
         {/* Metadata for non-camera events */}
         {!isCameraEvent && (
-          <div className="px-4 pt-4">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-2">Details</p>
-            <div className="rounded-lg border overflow-hidden">
-              <table className="w-full text-sm">
-                <tbody>
-                  {[
-                    ['When', format(event.timestamp, 'MMM d · HH:mm:ss')],
-                    ['Source', event.source],
-                    ['Store', event.store],
-                    ['Status', SEV_LABELS[event.severity] ?? event.severity],
-                    ...(event.confidence != null ? [['Confidence', `${Math.round(event.confidence * 100)}%`]] : []),
-                    ...(m.sku ? [['SKU', m.sku]] : []),
-                    ...(m.value ? [['Est. value', m.value]] : []),
-                    ...(m.amount ? [['Amount', m.amount]] : []),
-                    ...(m.processor ? [['Processor', m.processor]] : []),
-                    ...(m.items ? [['Items', m.items]] : []),
-                    ...(m.persons ? [['Persons', m.persons]] : []),
-                    ...(m.current && m.max ? [['Stock', `${m.current} / ${m.max}`]] : []),
-                    ...(m.from && m.to ? [['Failover', `${m.from} → ${m.to}`]] : []),
-                    ...(m.items_removed ? [['Items removed', m.items_removed]] : []),
-                  ].map(([key, value]) => (
-                    <tr key={key} className="border-b last:border-0">
-                      <td className="py-2 px-3 text-xs text-muted-foreground w-[38%]">{key}</td>
-                      <td className="py-2 px-3 text-xs font-medium">{value}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div className="px-5 pt-5">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Details</p>
+            <Card className="gap-0 overflow-hidden py-0 shadow-none">
+              <CardContent className="p-0">
+                <table className="w-full text-sm">
+                  <tbody>
+                    {[
+                      ['When', format(event.timestamp, 'MMM d · HH:mm:ss')],
+                      ['Source', event.source],
+                      ['Store', event.store],
+                      ['Status', SEV_LABELS[event.severity] ?? event.severity],
+                      ...(event.confidence != null ? [['Confidence', `${Math.round(event.confidence * 100)}%`]] : []),
+                      ...(m.sku ? [['SKU', m.sku]] : []),
+                      ...(m.value ? [['Est. value', m.value]] : []),
+                      ...(m.amount ? [['Amount', m.amount]] : []),
+                      ...(m.processor ? [['Processor', m.processor]] : []),
+                      ...(m.items ? [['Items', m.items]] : []),
+                      ...(m.persons ? [['Persons', m.persons]] : []),
+                      ...(m.current && m.max ? [['Stock', `${m.current} / ${m.max}`]] : []),
+                      ...(m.from && m.to ? [['Failover', `${m.from} → ${m.to}`]] : []),
+                      ...(m.items_removed ? [['Items removed', m.items_removed]] : []),
+                    ].map(([key, value]) => (
+                      <tr key={key} className="border-b last:border-0">
+                        <td className="w-[38%] px-4 py-2.5 text-xs text-muted-foreground">{key}</td>
+                        <td className="px-4 py-2.5 text-sm font-medium">{value}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
           </div>
         )}
 
         {/* Actions */}
-        <div className="px-4 py-4 flex flex-col gap-2">
+        <div className="flex flex-row gap-2 px-5 py-5">
           {isCameraEvent ? (
             <>
-              <Button
-                variant="outline"
-                className="w-full justify-center gap-2 border-blue-300 text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:border-blue-800 dark:text-blue-400 dark:hover:bg-blue-950"
-                onClick={handleRestartCamera}
-              >
-                <Wifi className="size-3.5" /> Restart camera
+              <Button variant="outline" className="min-w-0 flex-1 gap-1.5 px-2 py-2 text-xs leading-tight sm:gap-2 sm:px-3 sm:text-sm" onClick={handleRestartCamera}>
+                <Wifi className="size-4 shrink-0" />
+                <span className="min-w-0 text-balance">Restart camera</span>
               </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-center gap-2 border-amber-300 text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:border-amber-800 dark:text-amber-400 dark:hover:bg-amber-950"
-                onClick={handleAlertManager}
-              >
-                <Flag className="size-3.5" /> Alert store manager
+              <Button variant="secondary" className="min-w-0 flex-1 gap-1.5 px-2 py-2 text-xs leading-tight sm:gap-2 sm:px-3 sm:text-sm" onClick={handleAlertManager}>
+                <Flag className="size-4 shrink-0" />
+                <span className="min-w-0 text-balance">Alert manager</span>
               </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-center gap-2 border-green-300 text-green-600 hover:bg-green-50 hover:text-green-700 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950"
-                onClick={handleResolve}
-              >
-                <CheckCircle className="size-3.5" /> Mark as resolved
+              <Button variant="default" className="min-w-0 flex-1 gap-1.5 px-2 py-2 text-xs leading-tight sm:gap-2 sm:px-3 sm:text-sm" onClick={handleResolve}>
+                <CheckCircle className="size-4 shrink-0" />
+                <span className="min-w-0 text-balance">Mark resolved</span>
               </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-center text-muted-foreground"
-                onClick={handleDismiss}
-              >
-                Not an issue
+              <Button variant="ghost" className="min-w-0 flex-1 px-2 py-2 text-xs leading-tight text-muted-foreground hover:text-foreground sm:text-sm" onClick={handleDismiss}>
+                <span className="min-w-0 text-balance">Not an issue</span>
               </Button>
             </>
           ) : (
             <>
-              <Button
-                variant="outline"
-                className="w-full justify-center gap-2 border-amber-300 text-amber-600 hover:bg-amber-50 hover:text-amber-700 dark:border-amber-800 dark:text-amber-400 dark:hover:bg-amber-950"
-                onClick={handleFlag}
-              >
-                <Flag className="size-3.5" /> Flag for review
+              <Button variant="secondary" className="min-w-0 flex-1 gap-1.5 px-2 py-2 text-xs leading-tight sm:gap-2 sm:px-3 sm:text-sm" onClick={handleFlag}>
+                <Flag className="size-4 shrink-0" />
+                <span className="min-w-0 text-balance">Flag for review</span>
               </Button>
-              <Button
-                variant="outline"
-                className="w-full justify-center gap-2 border-green-300 text-green-600 hover:bg-green-50 hover:text-green-700 dark:border-green-800 dark:text-green-400 dark:hover:bg-green-950"
-                onClick={handleResolve}
-              >
-                <CheckCircle className="size-3.5" /> Mark as resolved
+              <Button variant="default" className="min-w-0 flex-1 gap-1.5 px-2 py-2 text-xs leading-tight sm:gap-2 sm:px-3 sm:text-sm" onClick={handleResolve}>
+                <CheckCircle className="size-4 shrink-0" />
+                <span className="min-w-0 text-balance">Mark as resolved</span>
               </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-center text-muted-foreground"
-                onClick={handleDismiss}
-              >
-                Not an issue
+              <Button variant="ghost" className="min-w-0 flex-1 px-2 py-2 text-xs leading-tight text-muted-foreground hover:text-foreground sm:text-sm" onClick={handleDismiss}>
+                <span className="min-w-0 text-balance">Not an issue</span>
               </Button>
             </>
           )}
         </div>
 
         {/* Notes */}
-        <div className="px-4 pb-6">
+        <div className="px-5 pb-8">
           <Separator className="mb-4" />
           <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">Notes</p>
           <div className="rounded-lg border overflow-hidden">
@@ -339,18 +322,23 @@ function EventDetailPanel({ event, onClose }: { event: StoreEvent; onClose: () =
                 }}
               />
               {comment.trim() && (
-                <button
-                  onClick={() => { toast('Comment added.'); setComment('') }}
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
                   className="shrink-0"
-                  style={{ color: 'var(--brand-accent)' }}
+                  onClick={() => {
+                    toast('Comment added.')
+                    setComment('')
+                  }}
                 >
                   <Send className="size-3.5" />
-                </button>
+                </Button>
               )}
             </div>
           </div>
         </div>
-      </ScrollArea>
+      </div>
     </motion.div>
   )
 }
@@ -531,11 +519,11 @@ export default function EventsPage() {
         {/* Event list */}
         <div
           className={cn(
-            'flex flex-col overflow-hidden transition-[width] duration-200',
-            selectedEvent ? 'w-[60%]' : 'w-full'
+            'flex min-h-0 flex-col overflow-hidden transition-[width] duration-200 min-w-0',
+            selectedEvent ? 'w-[42%]' : 'w-full'
           )}
         >
-          <ScrollArea className="flex-1 h-full">
+          <ScrollArea className="min-h-0 flex-1">
             <AnimatePresence initial={false}>
               {filteredEvents.length === 0 ? (
                 <div className="flex flex-col items-center justify-center gap-2 py-20 text-muted-foreground">
@@ -590,9 +578,9 @@ export default function EventsPage() {
                         </div>
                         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="xs"
-                            className="h-6 px-2 text-xs text-amber-600 hover:text-amber-700 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-950"
+                            className="h-6 px-2 text-xs"
                             onClick={(e) => {
                               e.stopPropagation()
                               toast.warning('Flagged for review', {
@@ -604,9 +592,9 @@ export default function EventsPage() {
                             Flag
                           </Button>
                           <Button
-                            variant="ghost"
+                            variant="secondary"
                             size="xs"
-                            className="h-6 px-2 text-xs text-green-600 hover:text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-950"
+                            className="h-6 px-2 text-xs"
                             onClick={(e) => {
                               e.stopPropagation()
                               toast.success('Marked as resolved', {
@@ -630,7 +618,10 @@ export default function EventsPage() {
         {/* Detail panel */}
         <AnimatePresence>
           {selectedEvent && (
-            <div className="w-[40%] overflow-hidden border-l" style={{ borderColor: 'var(--border)' }}>
+            <div
+              className="flex h-full min-h-0 min-w-0 w-[58%] shrink-0 flex-col overflow-hidden border-l"
+              style={{ borderColor: 'var(--border)' }}
+            >
               <EventDetailPanel event={selectedEvent} onClose={() => selectEvent(null)} />
             </div>
           )}

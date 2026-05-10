@@ -8,11 +8,11 @@ export function StoreSelector({ compact = false }: { compact?: boolean }) {
   const { selectedStore, setStore } = useStoreSelection()
 
   return (
-    <div className="relative">
+    <div className="relative w-full min-w-0">
       <select
         value={selectedStore}
         onChange={(e) => setStore(e.target.value)}
-        className="appearance-none text-sm pr-7 pl-3 py-1.5 rounded-md cursor-pointer"
+        className="w-full min-w-0 appearance-none text-sm pr-7 pl-3 py-1.5 rounded-md cursor-pointer"
         style={{
           background: 'var(--bg-elevated)',
           border: '1px solid var(--border-strong)',
