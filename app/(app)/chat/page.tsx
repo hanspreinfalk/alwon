@@ -169,7 +169,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex flex-col" style={{ height: 'calc(100vh - 52px - 48px)' }}>
+    <div className="flex min-h-0 flex-col" style={{ height: 'calc(100vh - 52px - 48px)' }}>
       {/* Header */}
       <div className="flex items-center justify-between pb-4 shrink-0">
         <div>
@@ -185,9 +185,9 @@ export default function ChatPage() {
       </div>
 
       {/* Main container */}
-      <div className="flex flex-1 flex-col overflow-hidden rounded-lg border border-border bg-card">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-border bg-card">
         {/* Messages */}
-        <ScrollArea className="flex-1 px-5 py-5">
+        <ScrollArea className="min-h-0 flex-1 px-5 py-5">
           <div className="flex flex-col gap-5">
             <AnimatePresence initial={false}>
               {messages.map((msg) => (
