@@ -50,28 +50,28 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    label: 'MONITOR',
+    label: 'Overview',
     items: [
-      { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-      { href: '/events', icon: Radio, label: 'Live Events' },
-      { href: '/loss-prevention', icon: ShieldAlert, label: 'Loss Prevention', badge: 12 },
+      { href: '/dashboard', icon: LayoutDashboard, label: 'Home' },
+      { href: '/events', icon: Radio, label: 'Activity' },
+      { href: '/loss-prevention', icon: ShieldAlert, label: 'Security', badge: 12 },
       { href: '/checkout', icon: ShoppingCart, label: 'Checkout' },
-      { href: '/inventory', icon: Package, label: 'Inventory' },
+      { href: '/inventory', icon: Package, label: 'Stock' },
     ],
   },
   {
-    label: 'OPERATE',
+    label: 'Daily work',
     items: [
       { href: '/payments', icon: CreditCard, label: 'Payments' },
-      { href: '/whatsapp', icon: MessageSquare, label: 'WhatsApp', badge: 4 },
-      { href: '/stores', icon: Store, label: 'Stores' },
-      { href: '/chat', icon: Bot, label: 'AI Assistant' },
+      { href: '/whatsapp', icon: MessageSquare, label: 'Messages', badge: 4 },
+      { href: '/stores', icon: Store, label: 'My stores' },
+      { href: '/chat', icon: Bot, label: 'Ask AI' },
     ],
   },
   {
-    label: 'CONFIGURE',
+    label: 'Setup',
     items: [
-      { href: '/settings?tab=rules', icon: BookOpen, label: 'Rules' },
+      { href: '/settings?tab=rules', icon: BookOpen, label: 'Alerts & rules' },
       { href: '/settings?tab=cameras', icon: Camera, label: 'Cameras' },
       { href: '/settings?tab=team', icon: Users, label: 'Team' },
       { href: '/settings', icon: Settings, label: 'Settings' },
@@ -95,10 +95,10 @@ function AlwonLogo({ collapsed }: { collapsed: boolean }) {
       </svg>
       {!collapsed && (
         <span
-          className="font-semibold text-sm whitespace-nowrap overflow-hidden"
-          style={{ color: 'var(--fg)', letterSpacing: '0.15em' }}
+          className="font-semibold text-base whitespace-nowrap overflow-hidden"
+          style={{ color: 'var(--fg)' }}
         >
-          ALWON
+          Alwon
         </span>
       )}
     </div>
@@ -155,8 +155,8 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             <div key={group.label} className="mb-5">
               {!collapsed && (
                 <div
-                  className="section-label px-2 mb-1.5"
-                  style={{ paddingTop: '0.125rem', paddingBottom: '0.125rem' }}
+                  className="px-2 mb-1.5 text-xs"
+                  style={{ color: 'var(--fg-muted)', fontWeight: 500, paddingTop: '0.125rem', paddingBottom: '0.125rem' }}
                 >
                   {group.label}
                 </div>
@@ -267,10 +267,10 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
                 {!collapsed && (
                   <>
                     <div className="flex-1 min-w-0 text-left">
-                      <p className="text-xs truncate" style={{ color: 'var(--fg)' }}>Elena Martinez</p>
-                      <p className="section-label truncate" style={{ fontSize: '0.6rem' }}>Store Manager</p>
+                      <p className="text-sm truncate" style={{ color: 'var(--fg)', fontWeight: 500 }}>Elena Martinez</p>
+                      <p className="text-xs truncate" style={{ color: 'var(--fg-muted)' }}>Store Manager</p>
                     </div>
-                    <MoreHorizontal size={14} style={{ color: 'var(--fg-dim)', flexShrink: 0 }} />
+                    <MoreHorizontal size={14} style={{ color: 'var(--fg-muted)', flexShrink: 0 }} />
                   </>
                 )}
               </button>

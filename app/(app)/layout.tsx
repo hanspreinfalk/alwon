@@ -54,8 +54,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             background: 'var(--bg-panel)',
             border: '1px solid var(--border-strong)',
             color: 'var(--fg)',
-            fontFamily: 'var(--font-mono)',
-            fontSize: '0.75rem',
+            fontSize: '0.875rem',
+            borderRadius: 'var(--radius)',
           },
         }}
       />

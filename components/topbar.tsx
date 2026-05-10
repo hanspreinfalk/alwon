@@ -26,29 +26,29 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 const ROUTES = [
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Live Events', href: '/events' },
-  { label: 'Loss Prevention', href: '/loss-prevention' },
+  { label: 'Home', href: '/dashboard' },
+  { label: 'Activity', href: '/events' },
+  { label: 'Security', href: '/loss-prevention' },
   { label: 'Checkout', href: '/checkout' },
-  { label: 'Inventory', href: '/inventory' },
+  { label: 'Stock', href: '/inventory' },
   { label: 'Payments', href: '/payments' },
-  { label: 'WhatsApp', href: '/whatsapp' },
-  { label: 'Stores', href: '/stores' },
-  { label: 'AI Assistant', href: '/chat' },
+  { label: 'Messages', href: '/whatsapp' },
+  { label: 'My stores', href: '/stores' },
+  { label: 'Ask AI', href: '/chat' },
   { label: 'Settings', href: '/settings' },
 ]
 
 const PATH_LABELS: Record<string, string> = {
-  '/dashboard': 'DASHBOARD',
-  '/events': 'LIVE EVENTS',
-  '/loss-prevention': 'LOSS PREVENTION',
-  '/checkout': 'CHECKOUT',
-  '/inventory': 'INVENTORY',
-  '/payments': 'PAYMENTS',
-  '/whatsapp': 'WHATSAPP',
-  '/stores': 'STORES',
-  '/chat': 'AI ASSISTANT',
-  '/settings': 'SETTINGS',
+  '/dashboard': 'Home',
+  '/events': 'Activity',
+  '/loss-prevention': 'Security',
+  '/checkout': 'Checkout',
+  '/inventory': 'Stock',
+  '/payments': 'Payments',
+  '/whatsapp': 'Messages',
+  '/stores': 'My stores',
+  '/chat': 'Ask AI',
+  '/settings': 'Settings',
 }
 
 function Breadcrumb() {
@@ -56,13 +56,15 @@ function Breadcrumb() {
   const segments = pathname.split('/').filter(Boolean)
 
   return (
-    <div className="flex items-center gap-1.5 section-label">
-      <span style={{ color: 'var(--fg-dim)' }}>STORES</span>
+    <div className="flex items-center gap-1.5 text-sm">
       {segments.map((seg, i) => (
         <span key={i} className="flex items-center gap-1.5">
-          <span style={{ color: 'var(--fg-dim)' }}>/</span>
-          <span style={{ color: i === segments.length - 1 ? 'var(--fg)' : 'var(--fg-muted)' }}>
-            {PATH_LABELS[`/${seg}`] ?? seg.toUpperCase()}
+          {i > 0 && <span style={{ color: 'var(--fg-dim)' }}>›</span>}
+          <span
+            className={i === segments.length - 1 ? 'font-medium' : ''}
+            style={{ color: i === segments.length - 1 ? 'var(--fg)' : 'var(--fg-muted)' }}
+          >
+            {PATH_LABELS[`/${seg}`] ?? seg.charAt(0).toUpperCase() + seg.slice(1)}
           </span>
         </span>
       ))}
@@ -111,13 +113,13 @@ function UserMenu() {
         style={{
           background: 'var(--bg-elevated)',
           border: '1px solid var(--border-strong)',
-          borderRadius: '2px',
+          borderRadius: 'var(--radius)',
         }}
       >
-        <DropdownMenuLabel style={{ color: 'var(--fg-dim)' }}>
+        <DropdownMenuLabel>
           <div className="flex flex-col">
-            <span className="text-xs font-medium" style={{ color: 'var(--fg)' }}>Elena Martinez</span>
-            <span className="section-label" style={{ fontSize: '0.6rem' }}>Store Manager · LIMA-03</span>
+            <span className="text-sm font-medium" style={{ color: 'var(--fg)' }}>Elena Martinez</span>
+            <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>Store Manager · LIMA-03</span>
           </div>
         </DropdownMenuLabel>
 
@@ -125,19 +127,19 @@ function UserMenu() {
 
         <DropdownMenuItem
           onClick={() => router.push('/settings')}
-          className="gap-2 cursor-pointer data-mono text-xs"
+          className="gap-2 cursor-pointer text-sm"
           style={{ color: 'var(--fg-muted)' }}
         >
-          <User size={13} />
-          Profile &amp; Account
+          <User size={14} />
+          My account
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => router.push('/settings')}
-          className="gap-2 cursor-pointer data-mono text-xs"
+          className="gap-2 cursor-pointer text-sm"
           style={{ color: 'var(--fg-muted)' }}
         >
-          <Settings size={13} />
+          <Settings size={14} />
           Settings
         </DropdownMenuItem>
 
@@ -146,12 +148,12 @@ function UserMenu() {
         {/* Theme sub-menu */}
         <DropdownMenuSub>
           <DropdownMenuSubTrigger
-            className="gap-2 data-mono text-xs"
+            className="gap-2 text-sm"
             style={{ color: 'var(--fg-muted)' }}
           >
-            {theme === 'light' ? <Sun size={13} /> : theme === 'dark' ? <Moon size={13} /> : <Monitor size={13} />}
-            Theme
-            <span className="ml-auto section-label" style={{ fontSize: '0.6rem', color: 'var(--fg-dim)' }}>
+            {theme === 'light' ? <Sun size={14} /> : theme === 'dark' ? <Moon size={14} /> : <Monitor size={14} />}
+            Appearance
+            <span className="ml-auto text-xs capitalize" style={{ color: 'var(--fg-muted)' }}>
               {theme ?? 'system'}
             </span>
           </DropdownMenuSubTrigger>
@@ -159,14 +161,14 @@ function UserMenu() {
             style={{
               background: 'var(--bg-elevated)',
               border: '1px solid var(--border-strong)',
-              borderRadius: '2px',
+              borderRadius: 'var(--radius)',
             }}
           >
             {themeOptions.map(({ label, value, icon: Icon }) => (
               <DropdownMenuItem
                 key={value}
                 onClick={() => setTheme(value)}
-                className="gap-2 cursor-pointer data-mono text-xs"
+                className="gap-2 cursor-pointer text-sm"
                 style={{
                   color: theme === value ? 'var(--brand-accent)' : 'var(--fg-muted)',
                   background: theme === value ? 'var(--brand-accent-glow)' : undefined,
@@ -186,10 +188,10 @@ function UserMenu() {
 
         <DropdownMenuItem
           onClick={() => router.push('/login')}
-          className="gap-2 cursor-pointer data-mono text-xs"
+          className="gap-2 cursor-pointer text-sm"
           style={{ color: 'var(--danger)' }}
         >
-          <LogOut size={13} />
+          <LogOut size={14} />
           Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -256,10 +258,10 @@ export function Topbar({ onMobileMenuToggle, onSidebarToggle }: {
           onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)' }}
         >
           <Search size={13} />
-          <span className="data-mono text-xs hidden sm:block">Search...</span>
+          <span className="text-xs hidden sm:block">Search anything…</span>
           <kbd
-            className="data-mono text-xs hidden md:block px-1 py-0.5"
-            style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-strong)', fontSize: '0.65rem' }}
+            className="data-mono hidden md:block px-1 py-0.5"
+            style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-strong)', fontSize: '0.65rem', borderRadius: 4 }}
           >
             ⌘K
           </kbd>
@@ -293,9 +295,11 @@ export function Topbar({ onMobileMenuToggle, onSidebarToggle }: {
         />
         <CommandList>
           <CommandEmpty>
-            <span className="section-label">No results found.</span>
+            <span className="text-sm" style={{ color: 'var(--fg-muted)' }}>
+              Nothing matches that search.
+            </span>
           </CommandEmpty>
-          <CommandGroup heading="ROUTES">
+          <CommandGroup heading="Pages">
             {ROUTES.map((r) => (
               <CommandItem
                 key={r.href}
@@ -305,7 +309,7 @@ export function Topbar({ onMobileMenuToggle, onSidebarToggle }: {
                   setCmdOpen(false)
                 }}
               >
-                <span className="data-mono text-xs">{r.label.toUpperCase()}</span>
+                <span className="text-sm">{r.label}</span>
               </CommandItem>
             ))}
           </CommandGroup>

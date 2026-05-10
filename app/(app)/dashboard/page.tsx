@@ -7,8 +7,9 @@ import { Play } from 'lucide-react'
 import { SectionHeader } from '@/components/section-header'
 import { MetricTile } from '@/components/metric-tile'
 import { EventStream } from '@/components/event-stream'
-import { StatusPill } from '@/components/status-pill'
 import { StoreSelector } from '@/components/store-selector'
+import { friendlyEvent } from '@/lib/labels'
+import type { EventType } from '@/lib/types'
 import {
   getDashboardMetrics,
   generateStores,
@@ -45,16 +46,16 @@ function OperationsHeatmap() {
   return (
     <div className="overflow-x-auto">
       {/* Hour labels */}
-      <div className="flex gap-px mb-1 pl-20">
+      <div className="flex gap-px mb-1 pl-24">
         {hours.map((h) => (
-          <div key={h} className="flex-1 text-center section-label" style={{ fontSize: '0.55rem' }}>
-            {h === 0 ? '00' : h === 6 ? '06' : h === 12 ? '12' : h === 18 ? '18' : h === 23 ? '23' : ''}
+          <div key={h} className="flex-1 text-center text-xs" style={{ fontSize: '0.65rem', color: 'var(--fg-muted)' }}>
+            {h === 0 ? '12 am' : h === 6 ? '6 am' : h === 12 ? '12 pm' : h === 18 ? '6 pm' : h === 23 ? '11 pm' : ''}
           </div>
         ))}
       </div>
       {STORE_IDS.map((storeId, si) => (
         <div key={storeId} className="flex items-center gap-px mb-px">
-          <div className="w-20 shrink-0 section-label truncate pr-2 text-right" style={{ fontSize: '0.58rem' }}>
+          <div className="w-24 shrink-0 truncate pr-2 text-right text-xs" style={{ color: 'var(--fg-muted)' }}>
             {storeId}
           </div>
           <div className="flex flex-1 gap-px">
@@ -79,16 +80,16 @@ export default function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>
-            Today&apos;s <em>operations</em>
+            Good morning, Elena
           </h1>
-          <p className="data-mono text-xs mt-1" style={{ color: 'var(--fg-dim)' }}>
-            {format(new Date(), 'EEEE, MMMM d yyyy')}
+          <p className="text-sm mt-1" style={{ color: 'var(--fg-muted)' }}>
+            Here&apos;s what&apos;s happening at your stores today — {format(new Date(), 'EEEE, MMMM d')}
           </p>
         </div>
         <div className="flex items-center gap-3">
           <StoreSelector />
           <button
-            className="data-mono text-xs px-3 py-1.5 transition-colors"
+            className="text-sm px-3 py-1.5 rounded-md transition-colors"
             style={{
               border: '1px solid var(--border-strong)',
               color: 'var(--fg-muted)',
@@ -96,7 +97,7 @@ export default function DashboardPage() {
             onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--fg)' }}
             onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--fg-muted)' }}
           >
-            EXPORT
+            Download report
           </button>
         </div>
       </div>
@@ -107,34 +108,34 @@ export default function DashboardPage() {
         style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
       >
         <MetricTile
-          label="EVENTS PROCESSED"
+          label="Activity today"
           value="12,847"
           delta={8.2}
         />
         <MetricTile
-          label="SHRINK PREVENTED"
+          label="Theft prevented"
           value="$2,340"
           sparkline={metrics.shrinkSparkline}
         />
         <MetricTile
-          label="STOCKOUTS RESOLVED"
+          label="Restocks done"
           value={metrics.stockoutsResolved}
           secondary={`avg ${metrics.avgResolutionTime}`}
         />
         <MetricTile
-          label="WALK-OUT CHECKOUTS"
+          label="Walk-out checkouts"
           value={metrics.walkouts}
           secondary={`${metrics.walkoutPct}% of total`}
         />
         <MetricTile
-          label="PAYMENT SUCCESS"
+          label="Payments working"
           value={`${metrics.paymentSuccessRate}%`}
-          secondary={`${metrics.paymentFailovers} failovers`}
+          secondary={`${metrics.paymentFailovers} retried`}
         />
         <MetricTile
-          label="ACTIVE CAMERAS"
+          label="Cameras online"
           value={`${metrics.activeCameras} / ${metrics.totalCameras}`}
-          secondary="2 offline"
+          secondary="2 need attention"
           onClick={() => router.push('/settings?tab=cameras')}
         />
       </div>
@@ -143,13 +144,13 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Left: event stream */}
         <div className="lg:col-span-3 flex flex-col" style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
-          <div className="px-4 pt-4">
+          <div className="px-5 pt-4">
             <SectionHeader
-              number="01"
-              title="LIVE EVENT STREAM"
+              title="What's happening now"
+              description="Live activity across all your stores"
               action={
                 <Link href="/events" style={{ color: 'var(--brand-accent)' }}>
-                  View all →
+                  See all →
                 </Link>
               }
             />
@@ -161,13 +162,13 @@ export default function DashboardPage() {
         <div className="lg:col-span-2 flex flex-col gap-4">
           {/* Flagged for review */}
           <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
-            <div className="px-4 pt-4 pb-2">
+            <div className="px-5 pt-4 pb-2">
               <SectionHeader
-                number="02"
-                title="FLAGGED FOR REVIEW"
+                title="Things to look at"
+                description="5 events that may need your attention"
                 action={
                   <Link href="/loss-prevention" style={{ color: 'var(--brand-accent)' }}>
-                    View queue →
+                    Open all →
                   </Link>
                 }
               />
@@ -196,15 +197,15 @@ export default function DashboardPage() {
                     <Play size={10} style={{ color: 'var(--fg-dim)' }} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs truncate" style={{ color: 'var(--fg)' }}>{item.type}</p>
-                    <p className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>{item.camera} · {item.time}</p>
+                    <p className="text-sm truncate" style={{ color: 'var(--fg)' }}>{friendlyEvent(item.type as EventType)}</p>
+                    <p className="text-xs" style={{ color: 'var(--fg-muted)' }}>{item.camera} · {item.time}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="data-mono text-xs" style={{ color: 'var(--danger)' }}>
-                      conf {item.conf}
+                    <span className="text-xs" style={{ color: 'var(--danger)' }}>
+                      {Math.round(item.conf * 100)}% sure
                     </span>
                     {item.value && (
-                      <p className="data-mono text-xs" style={{ color: 'var(--fg-muted)' }}>{item.value}</p>
+                      <p className="text-xs" style={{ color: 'var(--fg-muted)' }}>{item.value}</p>
                     )}
                   </div>
                 </Link>
@@ -214,13 +215,13 @@ export default function DashboardPage() {
 
           {/* Store health */}
           <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
-            <div className="px-4 pt-4 pb-2">
+            <div className="px-5 pt-4 pb-2">
               <SectionHeader
-                number="03"
-                title="STORE HEALTH"
+                title="How your stores are doing"
+                description="Live status and theft trend"
                 action={
                   <Link href="/stores" style={{ color: 'var(--brand-accent)' }}>
-                    All stores →
+                    See all →
                   </Link>
                 }
               />
@@ -230,23 +231,23 @@ export default function DashboardPage() {
                 <Link
                   key={store.id}
                   href={`/stores/${store.id}`}
-                  className="flex items-center gap-3 px-4 transition-colors"
-                  style={{ height: 44, borderBottom: '1px solid var(--border)' }}
+                  className="flex items-center gap-3 px-5 transition-colors"
+                  style={{ height: 48, borderBottom: '1px solid var(--border)' }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)' }}
                   onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
                 >
                   <span
                     style={{
-                      width: 6,
-                      height: 6,
+                      width: 7,
+                      height: 7,
                       borderRadius: '50%',
                       background: store.status === 'online' ? 'var(--success)' : store.status === 'degraded' ? 'var(--warning)' : 'var(--danger)',
                       flexShrink: 0,
                     }}
                   />
-                  <span className="data-mono text-xs flex-1" style={{ color: 'var(--fg)' }}>{store.id}</span>
-                  <span className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>{store.eventsPerHour}/h</span>
-                  <span className="data-mono text-xs" style={{ color: store.shrinkDelta > 0 ? 'var(--danger)' : 'var(--success)' }}>
+                  <span className="text-sm flex-1" style={{ color: 'var(--fg)' }}>{store.id}</span>
+                  <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>{store.eventsPerHour} events/hr</span>
+                  <span className="text-xs font-medium" style={{ color: store.shrinkDelta > 0 ? 'var(--danger)' : 'var(--success)', fontVariantNumeric: 'tabular-nums' }}>
                     {store.shrinkDelta > 0 ? '+' : ''}{store.shrinkDelta}%
                   </span>
                 </Link>
@@ -256,21 +257,24 @@ export default function DashboardPage() {
 
           {/* Today's anomalies */}
           <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
-            <div className="px-4 pt-4 pb-2">
-              <SectionHeader number="04" title="TODAY'S ANOMALIES" />
+            <div className="px-5 pt-4 pb-2">
+              <SectionHeader
+                title="Unusual patterns today"
+                description="Things that look different from a normal day"
+              />
             </div>
             <div className="flex flex-col gap-0" style={{ borderTop: '1px solid var(--border)' }}>
               {ANOMALY_DESCRIPTIONS.map((anomaly, i) => (
                 <div
                   key={i}
-                  className="px-4 py-3"
+                  className="px-5 py-3"
                   style={{ borderBottom: i < ANOMALY_DESCRIPTIONS.length - 1 ? '1px solid var(--border)' : undefined }}
                 >
-                  <div className="flex items-start gap-2">
-                    <span style={{ color: anomaly.severity === 'flagged' ? 'var(--danger)' : 'var(--warning)', fontSize: 7, marginTop: 4, flexShrink: 0 }}>●</span>
+                  <div className="flex items-start gap-2.5">
+                    <span style={{ color: anomaly.severity === 'flagged' ? 'var(--danger)' : 'var(--warning)', fontSize: 8, marginTop: 5, flexShrink: 0 }}>●</span>
                     <div>
-                      <p className="text-xs" style={{ color: 'var(--fg)' }}>{anomaly.title}</p>
-                      <p className="data-mono text-xs mt-0.5" style={{ color: 'var(--fg-dim)' }}>{anomaly.detail}</p>
+                      <p className="text-sm" style={{ color: 'var(--fg)' }}>{anomaly.title}</p>
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--fg-muted)' }}>{anomaly.detail}</p>
                     </div>
                   </div>
                 </div>
@@ -282,13 +286,16 @@ export default function DashboardPage() {
 
       {/* Heatmap */}
       <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
-        <div className="px-4 pt-4">
-          <SectionHeader number="02" title="OPERATIONS HEATMAP" />
+        <div className="px-5 pt-4">
+          <SectionHeader
+            title="Busiest times of day"
+            description="When your stores see the most activity"
+          />
         </div>
-        <div className="px-4 pb-4 pt-2" style={{ borderTop: '1px solid var(--border)' }}>
+        <div className="px-5 pb-5 pt-2" style={{ borderTop: '1px solid var(--border)' }}>
           <OperationsHeatmap />
-          <p className="data-mono text-xs mt-3" style={{ color: 'var(--fg-dim)' }}>
-            Events per hour by store · today · intensity scales to peak
+          <p className="text-xs mt-3" style={{ color: 'var(--fg-muted)' }}>
+            Each square shows one hour of the day. Brighter blue means more activity.
           </p>
         </div>
       </div>

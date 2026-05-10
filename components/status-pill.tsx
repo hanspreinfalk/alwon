@@ -1,4 +1,5 @@
 import type { EventSeverity } from '@/lib/types'
+import { friendlyStatus } from '@/lib/labels'
 
 const DOT_COLORS: Record<string, string> = {
   flagged: 'var(--danger)',
@@ -23,12 +24,12 @@ interface StatusPillProps {
 
 export function StatusPill({ status, label }: StatusPillProps) {
   const color = DOT_COLORS[status] ?? 'var(--fg-muted)'
-  const displayLabel = label ?? status
+  const displayLabel = label ?? friendlyStatus(status)
 
   return (
     <span className="inline-flex items-center gap-1.5">
       <span style={{ color, fontSize: 8, lineHeight: 1, flexShrink: 0 }}>●</span>
-      <span className="section-label" style={{ color: 'var(--fg-muted)' }}>
+      <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>
         {displayLabel}
       </span>
     </span>

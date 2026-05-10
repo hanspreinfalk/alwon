@@ -14,13 +14,13 @@ export function LiveClock() {
   }, [])
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="hidden sm:flex items-center gap-2">
       <LiveIndicator />
+      <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>
+        Live
+      </span>
       <span className="data-mono text-xs" style={{ color: 'var(--fg-muted)' }}>
-        LIVE ·{' '}
-        <span style={{ color: 'var(--fg)' }}>
-          {now ? format(now, 'HH:mm:ss') : '--:--:--'}
-        </span>
+        {now ? format(now, 'HH:mm') : '--:--'}
       </span>
     </div>
   )

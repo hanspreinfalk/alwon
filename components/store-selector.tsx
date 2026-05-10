@@ -12,7 +12,7 @@ export function StoreSelector({ compact = false }: { compact?: boolean }) {
       <select
         value={selectedStore}
         onChange={(e) => setStore(e.target.value)}
-        className="appearance-none data-mono text-xs pr-5 pl-2 py-1 rounded-md cursor-pointer"
+        className="appearance-none text-sm pr-7 pl-3 py-1.5 rounded-md cursor-pointer"
         style={{
           background: 'var(--bg-elevated)',
           border: '1px solid var(--border-strong)',
@@ -26,9 +26,9 @@ export function StoreSelector({ compact = false }: { compact?: boolean }) {
         ))}
       </select>
       <ChevronDown
-        size={10}
-        className="absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none"
-        style={{ color: 'var(--fg-dim)' }}
+        size={12}
+        className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none"
+        style={{ color: 'var(--fg-muted)' }}
       />
     </div>
   )

@@ -12,14 +12,14 @@ export default function StoresPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>
-          Store <em>network</em>
+          My stores
         </h1>
-        <p className="data-mono text-xs mt-1" style={{ color: 'var(--fg-dim)' }}>
-          {stores.filter((s) => s.status === 'online').length} online · {stores.filter((s) => s.status === 'degraded').length} degraded
+        <p className="text-sm mt-1" style={{ color: 'var(--fg-muted)' }}>
+          {stores.filter((s) => s.status === 'online').length} working normally · {stores.filter((s) => s.status === 'degraded').length} need attention
         </p>
       </div>
 
-      <SectionHeader number="01" title="ALL STORES" />
+      <SectionHeader title="All stores" description="Click any store to see details and live activity" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {stores.map((store) => (
@@ -38,7 +38,7 @@ export default function StoresPage() {
             }}
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="data-mono font-medium" style={{ color: 'var(--fg)' }}>{store.id}</span>
+              <span className="font-medium text-base" style={{ color: 'var(--fg)' }}>{store.id}</span>
               <span
                 style={{
                   width: 8,
@@ -51,38 +51,39 @@ export default function StoresPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="section-label">EVENTS / HOUR</p>
-                <p className="data-mono font-medium mt-0.5" style={{ color: 'var(--fg)' }}>{store.eventsPerHour}</p>
+                <p className="text-xs" style={{ color: 'var(--fg-muted)' }}>Activity / hour</p>
+                <p className="font-medium mt-0.5" style={{ color: 'var(--fg)', fontVariantNumeric: 'tabular-nums' }}>{store.eventsPerHour}</p>
               </div>
               <div>
-                <p className="section-label">SHRINK RATE</p>
-                <p className="data-mono font-medium mt-0.5" style={{
+                <p className="text-xs" style={{ color: 'var(--fg-muted)' }}>Theft rate</p>
+                <p className="font-medium mt-0.5" style={{
                   color: store.shrinkDelta > 0 ? 'var(--danger)' : 'var(--success)',
+                  fontVariantNumeric: 'tabular-nums',
                 }}>
                   {store.shrinkRate}%
-                  <span className="text-xs ml-1" style={{ color: 'var(--fg-dim)' }}>
+                  <span className="text-xs ml-1" style={{ color: 'var(--fg-muted)' }}>
                     {store.shrinkDelta > 0 ? '+' : ''}{store.shrinkDelta}%
                   </span>
                 </p>
               </div>
               <div>
-                <p className="section-label">REVENUE TODAY</p>
-                <p className="data-mono font-medium mt-0.5" style={{ color: 'var(--fg)' }}>
+                <p className="text-xs" style={{ color: 'var(--fg-muted)' }}>Sales today</p>
+                <p className="font-medium mt-0.5" style={{ color: 'var(--fg)', fontVariantNumeric: 'tabular-nums' }}>
                   ${store.revenue.toLocaleString()}
                 </p>
               </div>
               <div>
-                <p className="section-label">CAMERAS</p>
-                <p className="data-mono font-medium mt-0.5" style={{ color: 'var(--fg)' }}>
-                  {store.camerasOnline} / {store.cameraCount}
+                <p className="text-xs" style={{ color: 'var(--fg-muted)' }}>Cameras working</p>
+                <p className="font-medium mt-0.5" style={{ color: 'var(--fg)', fontVariantNumeric: 'tabular-nums' }}>
+                  {store.camerasOnline} of {store.cameraCount}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '1px solid var(--border)' }}>
-              <span className="section-label">{store.manager}</span>
-              <span className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>
-                sync {format(store.lastSync, 'HH:mm')}
+              <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>{store.manager}</span>
+              <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>
+                Updated {format(store.lastSync, 'HH:mm')}
               </span>
             </div>
           </Link>

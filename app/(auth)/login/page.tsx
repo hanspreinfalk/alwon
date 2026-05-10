@@ -61,23 +61,23 @@ export default function LoginPage() {
           className="text-xl font-semibold mb-1 text-center"
           style={{ color: 'var(--fg)' }}
         >
-          Sign in to <em>Alwon Console</em>
+          Welcome to Alwon
         </h1>
         <p
           className="text-center text-sm mb-8"
           style={{ color: 'var(--fg-muted)' }}
         >
-          Retail Automation OS
+          Sign in to manage your stores
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="flex flex-col gap-1.5">
-            <label className="section-label">EMAIL ADDRESS</label>
+            <label className="text-sm" style={{ color: 'var(--fg)', fontWeight: 500 }}>Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="operator@alwon.io"
+              placeholder="you@yourcompany.com"
               className="w-full px-3 py-2 text-sm rounded-md outline-none transition-colors"
               style={{
                 background: 'var(--bg-elevated)',
@@ -90,7 +90,7 @@ export default function LoginPage() {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="section-label">PASSWORD</label>
+            <label className="text-sm" style={{ color: 'var(--fg)', fontWeight: 500 }}>Password</label>
             <input
               type="password"
               value={password}
@@ -109,7 +109,7 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full py-2.5 data-mono text-sm font-medium tracking-widest transition-colors mt-1 rounded-md"
+            className="w-full py-2.5 text-sm font-medium transition-colors mt-1 rounded-md"
             style={{
               background: 'var(--brand-accent)',
               color: '#fff',
@@ -117,14 +117,14 @@ export default function LoginPage() {
             onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--brand-accent-hover)' }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--brand-accent)' }}
           >
-            CONTINUE →
+            Sign in
           </button>
         </form>
 
         <div className="flex flex-col gap-3 mt-5">
           <button
             type="button"
-            className="w-full py-2 data-mono text-xs tracking-widest transition-colors rounded-md"
+            className="w-full py-2 text-sm transition-colors rounded-md"
             style={{
               border: '1px solid var(--border-strong)',
               color: 'var(--fg-muted)',
@@ -133,7 +133,7 @@ export default function LoginPage() {
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--border-accent)' }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border-strong)' }}
           >
-            CONTINUE WITH SSO
+            Continue with single sign-on
           </button>
 
           <div className="text-center">

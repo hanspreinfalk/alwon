@@ -15,9 +15,9 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
           {icon}
         </div>
       )}
-      <p className="section-label mb-2">{title}</p>
+      <p className="text-base font-medium mb-1" style={{ color: 'var(--fg)' }}>{title}</p>
       {description && (
-        <p style={{ color: 'var(--fg-dim)', fontSize: '0.8125rem' }}>{description}</p>
+        <p style={{ color: 'var(--fg-muted)', fontSize: '0.875rem' }}>{description}</p>
       )}
       {action && <div className="mt-6">{action}</div>}
     </div>

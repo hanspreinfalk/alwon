@@ -101,10 +101,10 @@ export default function WhatsAppPage() {
     <div className="flex flex-col gap-4">
       <div>
         <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>
-          WhatsApp <em>inbox</em>
+          Messages
         </h1>
-        <p className="data-mono text-xs mt-1" style={{ color: 'var(--fg-dim)' }}>
-          {conversations.filter((c) => c.unreadCount > 0).length} unread conversations
+        <p className="text-sm mt-1" style={{ color: 'var(--fg-muted)' }}>
+          {conversations.filter((c) => c.unreadCount > 0).length} unread {conversations.filter((c) => c.unreadCount > 0).length === 1 ? 'message' : 'messages'} from customers
         </p>
       </div>
 
@@ -153,9 +153,11 @@ export default function WhatsAppPage() {
                   <span className="data-mono text-xs" style={{ color: 'var(--fg-dim)', fontSize: '0.6rem' }}>
                     {format(conv.lastMessageTime, 'HH:mm')}
                   </span>
-                  <span className="flex items-center gap-0.5">
+                  <span className="flex items-center gap-1">
                     <span style={{ fontSize: 6, color: conv.status === 'open' ? 'var(--warning)' : conv.status === 'resolved' ? 'var(--success)' : 'var(--fg-dim)' }}>●</span>
-                    <span className="section-label" style={{ fontSize: '0.55rem' }}>{conv.status}</span>
+                    <span className="text-xs" style={{ color: 'var(--fg-muted)', fontSize: '0.65rem' }}>
+                      {conv.status === 'open' ? 'Waiting' : conv.status === 'resolved' ? 'Done' : 'Pending'}
+                    </span>
                   </span>
                 </div>
               </div>
@@ -172,7 +174,7 @@ export default function WhatsAppPage() {
             />
           ) : (
             <div className="flex items-center justify-center h-full">
-              <p className="section-label">SELECT A CONVERSATION</p>
+              <p className="text-sm" style={{ color: 'var(--fg-muted)' }}>Choose a conversation to view it</p>
             </div>
           )}
         </div>
@@ -185,24 +187,24 @@ export default function WhatsAppPage() {
           {selected && (
             <>
               <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                <p className="section-label">CUSTOMER CONTEXT</p>
+                <p className="text-sm font-medium" style={{ color: 'var(--fg)' }}>About this customer</p>
               </div>
               <div className="flex flex-col gap-0 px-4 py-3">
                 {[
-                  ['ID', selected.customerId],
-                  ['STORE', 'LIMA-03'],
-                  ['ORDERS', '7 this month'],
-                  ['LAST VISIT', 'Today 11:24'],
-                  ['STATUS', selected.status],
+                  ['Customer ID', selected.customerId],
+                  ['Their store', 'LIMA-03'],
+                  ['Recent orders', '7 this month'],
+                  ['Last visit', 'Today, 11:24 AM'],
+                  ['Status', selected.status === 'open' ? 'Waiting' : selected.status === 'resolved' ? 'Done' : 'Pending'],
                 ].map(([k, v]) => (
                   <div key={k} className="flex justify-between py-2" style={{ borderBottom: '1px solid var(--border)' }}>
-                    <span className="section-label">{k}</span>
-                    <span className="data-mono text-xs" style={{ color: 'var(--fg-muted)' }}>{v}</span>
+                    <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>{k}</span>
+                    <span className="text-xs" style={{ color: 'var(--fg)' }}>{v}</span>
                   </div>
                 ))}
               </div>
               <div className="px-4 py-3" style={{ borderTop: '1px solid var(--border)' }}>
-                <p className="section-label mb-2">AI SUGGESTIONS</p>
+                <p className="text-sm font-medium mb-2" style={{ color: 'var(--fg)' }}>Suggested replies</p>
                 <div className="flex flex-col gap-2">
                   {AI_SUGGESTIONS.map((s, i) => (
                     <button

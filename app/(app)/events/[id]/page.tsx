@@ -6,6 +6,7 @@ import { ArrowLeft, Play, Flag, CheckCircle, MessageSquare } from 'lucide-react'
 import { format, subMinutes } from 'date-fns'
 import { toast } from 'sonner'
 import { generateEvent } from '@/lib/mock-data'
+import { friendlyEvent, friendlySeverity } from '@/lib/labels'
 
 const mockEvent = generateEvent(subMinutes(new Date(), 12))
 
@@ -18,10 +19,10 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
       {/* Back */}
       <Link
         href="/events"
-        className="flex items-center gap-2 data-mono text-xs self-start"
-        style={{ color: 'var(--fg-dim)' }}
+        className="flex items-center gap-2 text-sm self-start"
+        style={{ color: 'var(--fg-muted)' }}
       >
-        <ArrowLeft size={12} /> BACK TO EVENTS
+        <ArrowLeft size={14} /> Back to activity
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -62,31 +63,31 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           {/* Actions */}
           <div className="flex flex-col gap-2">
             <button
-              onClick={() => toast('Event flagged. Review queue updated.')}
-              className="flex items-center justify-center gap-2 py-2.5 data-mono text-xs transition-colors"
+              onClick={() => toast('Marked for review.')}
+              className="flex items-center justify-center gap-2 py-2.5 text-sm rounded-md transition-colors"
               style={{ border: '1px solid var(--warning)', color: 'var(--warning)' }}
               onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(251,191,36,0.08)' }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
             >
-              <Flag size={13} /> FLAG FOR REVIEW
+              <Flag size={14} /> Flag for review
             </button>
             <button
-              onClick={() => toast('Event resolved. Audit trail updated.')}
-              className="flex items-center justify-center gap-2 py-2.5 data-mono text-xs transition-colors"
+              onClick={() => toast('Marked as resolved.')}
+              className="flex items-center justify-center gap-2 py-2.5 text-sm rounded-md transition-colors"
               style={{ border: '1px solid var(--success)', color: 'var(--success)' }}
               onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(74,222,128,0.08)' }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
             >
-              <CheckCircle size={13} /> MARK RESOLVED
+              <CheckCircle size={14} /> Mark as resolved
             </button>
             <button
-              onClick={() => toast('Event dismissed.')}
-              className="flex items-center justify-center gap-2 py-2.5 data-mono text-xs transition-colors"
+              onClick={() => toast('Dismissed.')}
+              className="flex items-center justify-center gap-2 py-2.5 text-sm rounded-md transition-colors"
               style={{ border: '1px solid var(--border-strong)', color: 'var(--fg-muted)' }}
               onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)' }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
             >
-              DISMISS
+              Not an issue
             </button>
           </div>
         </div>
@@ -94,26 +95,25 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
         {/* Right */}
         <div className="flex flex-col gap-4">
           {/* Metadata */}
-          <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+          <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)', overflow: 'hidden' }}>
             <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-              <h2 className="text-lg font-semibold" style={{ color: 'var(--fg)' }}>{event.type}</h2>
-              <p className="data-mono text-xs mt-0.5" style={{ color: 'var(--fg-dim)' }}>
-                {format(event.timestamp, 'yyyy-MM-dd HH:mm:ss')}
+              <h2 className="text-lg font-semibold" style={{ color: 'var(--fg)' }}>{friendlyEvent(event.type)}</h2>
+              <p className="text-sm mt-0.5" style={{ color: 'var(--fg-muted)' }}>
+                {format(event.timestamp, 'MMM d · HH:mm:ss')}
               </p>
             </div>
-            <table className="w-full text-xs">
+            <table className="w-full text-sm">
               <tbody>
                 {[
-                  ['EVENT ID', event.id],
-                  ['SOURCE', event.source],
-                  ['STORE', event.store],
-                  ['SEVERITY', event.severity],
-                  ['CONFIDENCE', event.confidence?.toFixed(2) ?? '—'],
-                  ...Object.entries(event.metadata ?? {}).map(([k, v]) => [k.toUpperCase(), v]),
+                  ['Event ID', event.id],
+                  ['Where', event.source],
+                  ['Store', event.store],
+                  ['Status', friendlySeverity(event.severity)],
+                  ['Confidence', event.confidence ? `${Math.round(event.confidence * 100)}% sure` : '—'],
                 ].map(([key, value]) => (
                   <tr key={key} style={{ borderBottom: '1px solid var(--border)' }}>
-                    <td className="section-label px-4 py-2.5 w-1/2">{key}</td>
-                    <td className="data-mono px-4 py-2.5" style={{ color: 'var(--fg)' }}>{value}</td>
+                    <td className="px-4 py-2.5 w-1/2 text-xs" style={{ color: 'var(--fg-muted)' }}>{key}</td>
+                    <td className="px-4 py-2.5" style={{ color: 'var(--fg)' }}>{value}</td>
                   </tr>
                 ))}
               </tbody>
@@ -121,9 +121,9 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
           </div>
 
           {/* Comments */}
-          <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+          <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)', overflow: 'hidden' }}>
             <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-              <p className="section-label">COMMENTS</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--fg)' }}>Notes</p>
             </div>
             <div className="flex flex-col gap-0">
               {[

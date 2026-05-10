@@ -20,10 +20,10 @@ export default function PaymentsPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>
-          Payment <em>routing</em>
+          Payments
         </h1>
-        <p className="data-mono text-xs mt-1" style={{ color: 'var(--fg-dim)' }}>
-          Reconciliation & PSP health
+        <p className="text-sm mt-1" style={{ color: 'var(--fg-muted)' }}>
+          How payments are being processed and how it&apos;s going.
         </p>
       </div>
 
@@ -33,26 +33,29 @@ export default function PaymentsPage() {
         style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
       >
         {[
-          { label: 'SUCCESS RATE', value: `${successRate}%`, color: 'var(--success)' },
-          { label: 'TOTAL VOLUME', value: `${totalVolume.toLocaleString()}`, color: 'var(--fg)' },
-          { label: 'FAILOVERS TODAY', value: String(totalFailovers), color: totalFailovers > 5 ? 'var(--warning)' : 'var(--fg)' },
-          { label: 'FAILURES', value: String(transactions.filter((t) => t.status === 'failed').length), color: 'var(--danger)' },
+          { label: 'Working rate', value: `${successRate}%`, color: 'var(--success)' },
+          { label: 'Payments today', value: `${totalVolume.toLocaleString()}`, color: 'var(--fg)' },
+          { label: 'Retried', value: String(totalFailovers), color: totalFailovers > 5 ? 'var(--warning)' : 'var(--fg)' },
+          { label: 'Failed', value: String(transactions.filter((t) => t.status === 'failed').length), color: 'var(--danger)' },
         ].map((stat, i, arr) => (
           <div
             key={stat.label}
-            className="p-4"
+            className="p-5"
             style={{ borderRight: i < arr.length - 1 ? '1px solid var(--border)' : undefined }}
           >
-            <p className="section-label">{stat.label}</p>
-            <p className="data-mono font-semibold mt-1" style={{ fontSize: '1.5rem', color: stat.color }}>{stat.value}</p>
+            <p className="text-xs" style={{ color: 'var(--fg-muted)' }}>{stat.label}</p>
+            <p className="font-semibold mt-1" style={{ fontSize: '1.625rem', color: stat.color, fontVariantNumeric: 'tabular-nums' }}>{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* Success rate chart */}
       <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
-        <div className="px-4 pt-4">
-          <SectionHeader number="01" title="SUCCESS RATE — LAST 15H" />
+        <div className="px-5 pt-4">
+          <SectionHeader
+            title="How payments have been doing"
+            description="The percentage that worked over the last 15 hours"
+          />
         </div>
         <div className="px-4 pb-4 pt-2" style={{ borderTop: '1px solid var(--border)' }}>
           <ResponsiveContainer width="100%" height={120}>
@@ -96,8 +99,11 @@ export default function PaymentsPage() {
 
       {/* PSP routing */}
       <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
-        <div className="px-4 pt-4">
-          <SectionHeader number="02" title="PSP ROUTING" />
+        <div className="px-5 pt-4">
+          <SectionHeader
+            title="Payment processors"
+            description="Which services are handling your payments"
+          />
         </div>
         <div className="flex flex-col gap-0 px-4 pb-4 pt-2" style={{ borderTop: '1px solid var(--border)' }}>
           {processors.map((proc) => {
@@ -127,17 +133,20 @@ export default function PaymentsPage() {
 
       {/* Recent transactions */}
       <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
-        <div className="px-4 pt-4">
-          <SectionHeader number="03" title="RECENT TRANSACTIONS" />
+        <div className="px-5 pt-4">
+          <SectionHeader
+            title="Recent payments"
+            description="The last 20 payments across all your stores"
+          />
         </div>
         <div style={{ borderTop: '1px solid var(--border)' }}>
-          <div className="flex items-center gap-3 px-4 py-2" style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg)' }}>
-            <span className="section-label w-28">TIME</span>
-            <span className="section-label flex-1">ID</span>
-            <span className="section-label w-20">AMOUNT</span>
-            <span className="section-label w-20">PROCESSOR</span>
-            <span className="section-label w-20">STORE</span>
-            <span className="section-label w-20 text-right">STATUS</span>
+          <div className="flex items-center gap-3 px-4 py-2.5" style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg)' }}>
+            <span className="text-xs w-28" style={{ color: 'var(--fg-muted)' }}>When</span>
+            <span className="text-xs flex-1" style={{ color: 'var(--fg-muted)' }}>Reference</span>
+            <span className="text-xs w-20" style={{ color: 'var(--fg-muted)' }}>Amount</span>
+            <span className="text-xs w-20" style={{ color: 'var(--fg-muted)' }}>Service</span>
+            <span className="text-xs w-20" style={{ color: 'var(--fg-muted)' }}>Store</span>
+            <span className="text-xs w-20 text-right" style={{ color: 'var(--fg-muted)' }}>Status</span>
           </div>
           {transactions.slice(0, 20).map((tx) => (
             <div
@@ -147,29 +156,31 @@ export default function PaymentsPage() {
               onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)' }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
             >
-              <span className="data-mono text-xs w-28" style={{ color: 'var(--fg-dim)' }}>
-                {format(tx.timestamp, 'HH:mm:ss')}
+              <span className="text-xs w-28" style={{ color: 'var(--fg-muted)' }}>
+                {format(tx.timestamp, 'HH:mm')}
               </span>
               <span className="data-mono text-xs flex-1" style={{ color: 'var(--fg-muted)' }}>{tx.id}</span>
-              <span className="data-mono text-xs w-20" style={{ color: 'var(--fg)' }}>
+              <span className="text-sm w-20" style={{ color: 'var(--fg)', fontVariantNumeric: 'tabular-nums' }}>
                 ${tx.amount.toFixed(2)}
               </span>
-              <span className="data-mono text-xs w-20" style={{ color: 'var(--fg-muted)' }}>{tx.processor}</span>
-              <span className="data-mono text-xs w-20" style={{ color: 'var(--fg-dim)' }}>{tx.store.split('-')[0]}</span>
+              <span className="text-xs w-20" style={{ color: 'var(--fg-muted)' }}>{tx.processor}</span>
+              <span className="text-xs w-20" style={{ color: 'var(--fg-muted)' }}>{tx.store.split('-')[0]}</span>
               <span
                 className="flex items-center justify-end gap-1.5 w-20"
               >
                 <span style={{
-                  fontSize: 7,
+                  fontSize: 8,
                   color: tx.status === 'success' ? 'var(--success)'
                     : tx.status === 'failover' ? 'var(--warning)'
                     : 'var(--danger)',
                 }}>●</span>
-                <span className="data-mono text-xs" style={{
+                <span className="text-xs" style={{
                   color: tx.status === 'success' ? 'var(--success)'
                     : tx.status === 'failover' ? 'var(--warning)'
                     : 'var(--danger)',
-                }}>{tx.status}</span>
+                }}>
+                  {tx.status === 'success' ? 'OK' : tx.status === 'failover' ? 'Retried' : tx.status === 'failed' ? 'Failed' : 'Pending'}
+                </span>
               </span>
             </div>
           ))}

@@ -16,26 +16,26 @@ export default function StoreDetailPage({ params }: { params: Promise<{ id: stri
 
   return (
     <div className="flex flex-col gap-6">
-      <Link href="/stores" className="flex items-center gap-2 data-mono text-xs self-start" style={{ color: 'var(--fg-dim)' }}>
-        <ArrowLeft size={12} /> BACK TO STORES
+      <Link href="/stores" className="flex items-center gap-2 text-sm self-start" style={{ color: 'var(--fg-muted)' }}>
+        <ArrowLeft size={14} /> Back to all stores
       </Link>
 
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>
-            <em>{store.id}</em>
+            {store.id}
           </h1>
           <div className="flex items-center gap-2 mt-1">
             <span
               style={{
-                width: 6,
-                height: 6,
+                width: 7,
+                height: 7,
                 borderRadius: '50%',
                 background: store.status === 'online' ? 'var(--success)' : store.status === 'degraded' ? 'var(--warning)' : 'var(--danger)',
               }}
             />
-            <span className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>
-              {store.status} · last sync {format(store.lastSync, 'HH:mm')}
+            <span className="text-sm" style={{ color: 'var(--fg-muted)' }}>
+              {store.status === 'online' ? 'Working normally' : store.status === 'degraded' ? 'Some issues' : 'Offline'} · updated {format(store.lastSync, 'HH:mm')}
             </span>
           </div>
         </div>
@@ -47,42 +47,42 @@ export default function StoreDetailPage({ params }: { params: Promise<{ id: stri
         style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
       >
         {[
-          { label: 'EVENTS / HOUR', value: store.eventsPerHour },
-          { label: 'SHRINK RATE', value: `${store.shrinkRate}%` },
-          { label: 'REVENUE TODAY', value: `$${store.revenue.toLocaleString()}` },
-          { label: 'CAMERAS', value: `${store.camerasOnline} / ${store.cameraCount}` },
+          { label: 'Activity / hour', value: store.eventsPerHour },
+          { label: 'Theft rate', value: `${store.shrinkRate}%` },
+          { label: 'Sales today', value: `$${store.revenue.toLocaleString()}` },
+          { label: 'Cameras working', value: `${store.camerasOnline} of ${store.cameraCount}` },
         ].map((m, i, arr) => (
           <div
             key={m.label}
-            className="p-4"
+            className="p-5"
             style={{ borderRight: i < arr.length - 1 ? '1px solid var(--border)' : undefined }}
           >
-            <p className="section-label">{m.label}</p>
-            <p className="data-mono font-semibold mt-1" style={{ fontSize: '1.25rem', color: 'var(--fg)' }}>{m.value}</p>
+            <p className="text-xs" style={{ color: 'var(--fg-muted)' }}>{m.label}</p>
+            <p className="font-semibold mt-1" style={{ fontSize: '1.5rem', color: 'var(--fg)', fontVariantNumeric: 'tabular-nums' }}>{m.value}</p>
           </div>
         ))}
       </div>
 
       {/* Store details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+        <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)', overflow: 'hidden' }}>
           <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-            <p className="section-label">STORE INFO</p>
+            <p className="text-sm font-medium" style={{ color: 'var(--fg)' }}>About this store</p>
           </div>
-          <table className="w-full text-xs">
+          <table className="w-full text-sm">
             <tbody>
               {[
-                ['STORE ID', store.id],
-                ['LOCATION', store.location],
-                ['STATUS', store.status],
-                ['MANAGER', store.manager],
-                ['CAMERAS TOTAL', store.cameraCount],
-                ['CAMERAS ONLINE', store.camerasOnline],
-                ['LAST SYNC', format(store.lastSync, 'HH:mm:ss')],
+                ['Store ID', store.id],
+                ['City', store.location],
+                ['Status', store.status === 'online' ? 'Working normally' : store.status === 'degraded' ? 'Some issues' : 'Offline'],
+                ['Manager', store.manager],
+                ['Cameras total', String(store.cameraCount)],
+                ['Cameras working', String(store.camerasOnline)],
+                ['Last update', format(store.lastSync, 'HH:mm:ss')],
               ].map(([k, v]) => (
                 <tr key={k} style={{ borderBottom: '1px solid var(--border)' }}>
-                  <td className="section-label px-4 py-2.5 w-1/2">{k}</td>
-                  <td className="data-mono px-4 py-2.5" style={{ color: 'var(--fg)' }}>{v}</td>
+                  <td className="px-4 py-2.5 w-1/2 text-xs" style={{ color: 'var(--fg-muted)' }}>{k}</td>
+                  <td className="px-4 py-2.5" style={{ color: 'var(--fg)' }}>{v}</td>
                 </tr>
               ))}
             </tbody>
@@ -94,19 +94,18 @@ export default function StoreDetailPage({ params }: { params: Promise<{ id: stri
           className="flex flex-col items-center justify-center"
           style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)', minHeight: 200 }}
         >
-          <MapPin size={24} style={{ color: 'var(--fg-dim)', marginBottom: 8 }} />
-          <p className="section-label">MAP PLACEHOLDER</p>
-          <p className="data-mono text-xs mt-1" style={{ color: 'var(--fg-dim)' }}>{store.location}</p>
+          <MapPin size={28} style={{ color: 'var(--fg-muted)', marginBottom: 8 }} />
+          <p className="text-sm font-medium" style={{ color: 'var(--fg)' }}>Map coming soon</p>
+          <p className="text-xs mt-1" style={{ color: 'var(--fg-muted)' }}>{store.location}</p>
         </div>
       </div>
 
       {/* Live events scoped to store */}
       <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
-        <div className="px-4 pt-4">
+        <div className="px-5 pt-4">
           <SectionHeader
-            number="01"
-            title="LIVE EVENTS"
-            action={<span style={{ color: 'var(--fg-dim)' }}>All stores (no store filter)</span>}
+            title="What's happening at this store now"
+            description="Live activity"
           />
         </div>
         <EventStream limit={20} />

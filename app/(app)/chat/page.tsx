@@ -183,23 +183,23 @@ export default function ChatPage() {
       <div className="flex items-center justify-between pb-4 shrink-0">
         <div>
           <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>
-            AI <em>assistant</em>
+            Ask AI
           </h1>
           <div className="flex items-center gap-2 mt-1">
             <LiveIndicator />
-            <span className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>
-              Live store context · {stores.length} stores · {metrics.eventsProcessed.toLocaleString()} events today
+            <span className="text-sm" style={{ color: 'var(--fg-muted)' }}>
+              I know about your {stores.length} stores and the {metrics.eventsProcessed.toLocaleString()} things that happened today.
             </span>
           </div>
         </div>
         <button
           onClick={clearChat}
-          className="flex items-center gap-1.5 px-3 py-1.5 data-mono text-xs transition-colors"
-          style={{ border: '1px solid var(--border-strong)', color: 'var(--fg-dim)' }}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors"
+          style={{ border: '1px solid var(--border-strong)', color: 'var(--fg-muted)' }}
           onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--fg)' }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--fg-dim)' }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--fg-muted)' }}
         >
-          <RotateCcw size={12} /> CLEAR CHAT
+          <RotateCcw size={13} /> Clear chat
         </button>
       </div>
 
@@ -330,12 +330,12 @@ export default function ChatPage() {
           <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
             <div className="flex items-center gap-2">
               <Sparkles size={12} style={{ color: 'var(--brand-accent)' }} />
-              <p className="section-label">LIVE CONTEXT</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--fg)' }}>What I&apos;m looking at</p>
             </div>
           </div>
 
           <div className="flex flex-col gap-0 px-4 py-3">
-            <p className="section-label mb-2" style={{ color: 'var(--fg-dim)' }}>NETWORK STATUS</p>
+            <p className="text-xs mb-2" style={{ color: 'var(--fg-muted)' }}>System status</p>
             {[
               { label: 'Events today', value: metrics.eventsProcessed.toLocaleString() },
               { label: 'Open incidents', value: String(incidents.filter(i => i.status === 'open').length) },
@@ -351,7 +351,7 @@ export default function ChatPage() {
           </div>
 
           <div className="flex flex-col gap-0 px-4 py-3" style={{ borderTop: '1px solid var(--border)' }}>
-            <p className="section-label mb-2" style={{ color: 'var(--fg-dim)' }}>STORE HEALTH</p>
+            <p className="text-xs mb-2" style={{ color: 'var(--fg-muted)' }}>Stores</p>
             {stores.slice(0, 6).map((store) => (
               <div key={store.id} className="flex items-center gap-2 py-2" style={{ borderBottom: '1px solid var(--border)' }}>
                 <span style={{
@@ -370,7 +370,7 @@ export default function ChatPage() {
           </div>
 
           <div className="flex flex-col gap-2 px-4 py-3" style={{ borderTop: '1px solid var(--border)' }}>
-            <p className="section-label mb-1" style={{ color: 'var(--fg-dim)' }}>SUGGESTED</p>
+            <p className="text-xs mb-1" style={{ color: 'var(--fg-muted)' }}>Try asking</p>
             {SUGGESTED_PROMPTS.slice(4).map((prompt) => (
               <button
                 key={prompt}

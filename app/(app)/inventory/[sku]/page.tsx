@@ -16,58 +16,60 @@ export default function SKUDetailPage({ params }: { params: Promise<{ sku: strin
 
   return (
     <div className="flex flex-col gap-6 max-w-3xl">
-      <Link href="/inventory" className="flex items-center gap-2 data-mono text-xs self-start" style={{ color: 'var(--fg-dim)' }}>
-        <ArrowLeft size={12} /> BACK TO INVENTORY
+      <Link href="/inventory" className="flex items-center gap-2 text-sm self-start" style={{ color: 'var(--fg-muted)' }}>
+        <ArrowLeft size={14} /> Back to stock
       </Link>
 
       <div>
         <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>
-          {sku.id} — <em>{sku.name}</em>
+          {sku.name}
         </h1>
-        <p className="data-mono text-xs mt-1" style={{ color: 'var(--fg-dim)' }}>{sku.shelf} · {sku.category}</p>
+        <p className="text-sm mt-1" style={{ color: 'var(--fg-muted)' }}>
+          <span className="data-mono">{sku.id}</span> · on {sku.shelf} · {sku.category}
+        </p>
       </div>
 
       <div
         className="grid grid-cols-2 sm:grid-cols-4"
-        style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
+        style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
       >
         {[
-          { label: 'CURRENT STOCK', value: `${sku.currentStock} / ${sku.maxStock}`, color },
-          { label: 'VELOCITY', value: `${sku.velocity}/h`, color: 'var(--fg)' },
-          { label: 'OOS RISK', value: sku.oosRisk.toUpperCase(), color: color },
-          { label: 'PRICE', value: `$${sku.price.toFixed(2)}`, color: 'var(--fg)' },
+          { label: 'In stock', value: `${sku.currentStock} of ${sku.maxStock}`, color },
+          { label: 'Sells per hour', value: `${sku.velocity}`, color: 'var(--fg)' },
+          { label: 'Stock status', value: sku.oosRisk === 'low' ? 'Healthy' : sku.oosRisk === 'medium' ? 'Watch' : sku.oosRisk === 'high' ? 'Low' : 'Critical', color: color },
+          { label: 'Price', value: `$${sku.price.toFixed(2)}`, color: 'var(--fg)' },
         ].map((m, i, arr) => (
           <div
             key={m.label}
-            className="p-4"
+            className="p-5"
             style={{ borderRight: i < arr.length - 1 ? '1px solid var(--border)' : undefined }}
           >
-            <p className="section-label mb-1">{m.label}</p>
-            <p className="data-mono font-semibold text-xl" style={{ color: m.color }}>{m.value}</p>
+            <p className="text-xs mb-1" style={{ color: 'var(--fg-muted)' }}>{m.label}</p>
+            <p className="font-semibold" style={{ fontSize: '1.5rem', color: m.color, fontVariantNumeric: 'tabular-nums' }}>{m.value}</p>
           </div>
         ))}
       </div>
 
-      <div style={{ border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
+      <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)', overflow: 'hidden' }}>
         <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-          <p className="section-label">SKU DETAILS</p>
+          <p className="text-sm font-medium" style={{ color: 'var(--fg)' }}>Product details</p>
         </div>
-        <table className="w-full text-xs">
+        <table className="w-full text-sm">
           <tbody>
             {[
-              ['SKU ID', sku.id],
-              ['NAME', sku.name],
-              ['SHELF', sku.shelf],
-              ['CATEGORY', sku.category],
-              ['STOCK', `${sku.currentStock} / ${sku.maxStock} units`],
-              ['VELOCITY', `${sku.velocity} units/hour`],
-              ['LAST RESTOCK', format(sku.lastRestock, 'MMM d yyyy HH:mm')],
-              ['OOS RISK', sku.oosRisk],
-              ['UNIT PRICE', `$${sku.price.toFixed(2)}`],
+              ['Product code', sku.id],
+              ['Name', sku.name],
+              ['Shelf', sku.shelf],
+              ['Category', sku.category],
+              ['Stock', `${sku.currentStock} of ${sku.maxStock} on shelf`],
+              ['Sells per hour', `${sku.velocity}`],
+              ['Last restocked', format(sku.lastRestock, 'MMM d, yyyy · HH:mm')],
+              ['Stock status', sku.oosRisk === 'low' ? 'Healthy' : sku.oosRisk === 'medium' ? 'Watch' : sku.oosRisk === 'high' ? 'Low' : 'Critical'],
+              ['Price', `$${sku.price.toFixed(2)}`],
             ].map(([key, value]) => (
               <tr key={key} style={{ borderBottom: '1px solid var(--border)' }}>
-                <td className="section-label px-4 py-2.5 w-40">{key}</td>
-                <td className="data-mono px-4 py-2.5" style={{ color: 'var(--fg)' }}>{value}</td>
+                <td className="px-4 py-2.5 w-40 text-xs" style={{ color: 'var(--fg-muted)' }}>{key}</td>
+                <td className="px-4 py-2.5" style={{ color: 'var(--fg)' }}>{value}</td>
               </tr>
             ))}
           </tbody>

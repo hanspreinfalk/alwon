@@ -226,11 +226,23 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Section label style */
+/* Small label — used for field labels, group titles, helper text.
+   Friendlier sentence-case sans-serif (was uppercase mono). */
 .section-label {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 500;
+  color: var(--fg-muted);
+}
+
+/* Use this when you really want the small uppercase mono label
+   (e.g. for tabular column headers where it adds clarity). */
+.tech-label {
   font-family: var(--font-mono), monospace;
   font-size: 0.6875rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--fg-dim);
 }

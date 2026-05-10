@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react'
 import { TrendingUp, TrendingDown } from 'lucide-react'
 
 interface MetricTileProps {
@@ -38,20 +37,26 @@ function Sparkline({ data }: { data: number[] }) {
   )
 }
 
-export function MetricTile({ label, value, delta, deltaLabel, secondary, sparkline, onClick }: MetricTileProps) {
+// "EVENTS PROCESSED" → "Events processed"
+function softenLabel(label: string): string {
+  if (label !== label.toUpperCase()) return label
+  return label.charAt(0) + label.slice(1).toLowerCase()
+}
+
+export function MetricTile({ label, value, delta, secondary, sparkline, onClick }: MetricTileProps) {
   const isPositive = (delta ?? 0) >= 0
 
   return (
     <div
       onClick={onClick}
-      className={`flex flex-col gap-1 p-4 border-r last:border-r-0 ${onClick ? 'cursor-pointer hover:bg-[var(--bg-hover)] transition-colors' : ''}`}
+      className={`flex flex-col gap-1.5 p-5 border-r last:border-r-0 ${onClick ? 'cursor-pointer hover:bg-[var(--bg-hover)] transition-colors' : ''}`}
       style={{ borderColor: 'var(--border)' }}
     >
-      <p className="section-label">{label}</p>
-      <div className="flex items-end justify-between gap-2 mt-1">
+      <p className="text-xs" style={{ color: 'var(--fg-muted)' }}>{softenLabel(label)}</p>
+      <div className="flex items-end justify-between gap-2 mt-0.5">
         <span
-          className="data-mono font-semibold leading-none"
-          style={{ fontSize: '1.5rem', color: 'var(--fg)' }}
+          className="font-semibold leading-none"
+          style={{ fontSize: '1.625rem', color: 'var(--fg)', fontVariantNumeric: 'tabular-nums' }}
         >
           {value}
         </span>
@@ -60,15 +65,15 @@ export function MetricTile({ label, value, delta, deltaLabel, secondary, sparkli
       <div className="flex items-center gap-2 mt-0.5">
         {delta !== undefined && (
           <span
-            className="flex items-center gap-0.5 data-mono text-xs"
-            style={{ color: isPositive ? 'var(--success)' : 'var(--danger)' }}
+            className="flex items-center gap-0.5 text-xs"
+            style={{ color: isPositive ? 'var(--success)' : 'var(--danger)', fontVariantNumeric: 'tabular-nums' }}
           >
-            {isPositive ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+            {isPositive ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
             {isPositive ? '+' : ''}{delta}%
           </span>
         )}
         {secondary && (
-          <span className="data-mono text-xs" style={{ color: 'var(--fg-muted)' }}>
+          <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>
             {secondary}
           </span>
         )}

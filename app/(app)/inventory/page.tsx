@@ -57,7 +57,7 @@ function ShelfCard({ shelf, skus }: { shelf: string; skus: SKU[] }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <p className="section-label mb-2">{shelf}</p>
+      <p className="text-sm font-medium mb-2" style={{ color: 'var(--fg)' }}>{shelf}</p>
       <div className="flex items-center gap-2 mb-2">
         <div
           className="flex-1 rounded-full overflow-hidden"
@@ -68,18 +68,18 @@ function ShelfCard({ shelf, skus }: { shelf: string; skus: SKU[] }) {
             style={{ width: `${pct * 100}%`, background: color }}
           />
         </div>
-        <span className="data-mono text-xs shrink-0" style={{ color: 'var(--fg-dim)' }}>
+        <span className="text-xs shrink-0" style={{ color: 'var(--fg-muted)' }}>
           {total}/{maxTotal}
         </span>
       </div>
-      <p className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>{skus.length} SKUs</p>
+      <p className="text-xs" style={{ color: 'var(--fg-muted)' }}>{skus.length} {skus.length === 1 ? 'product' : 'products'}</p>
 
       {hovered && (
         <div
           className="absolute left-0 right-0 bottom-full z-10 p-3 mb-1"
-          style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)' }}
+          style={{ borderRadius: 'var(--radius)', background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)' }}
         >
-          <p className="section-label mb-2">ITEMS ON SHELF</p>
+          <p className="text-xs mb-2" style={{ color: 'var(--fg-muted)' }}>Items on this shelf</p>
           {skus.slice(0, 4).map((sku) => (
             <div key={sku.id} className="flex justify-between text-xs py-0.5" style={{ color: 'var(--fg-muted)' }}>
               <span className="data-mono truncate flex-1">{sku.id}</span>
@@ -143,8 +143,8 @@ function TableView({ skus, search }: { skus: SKU[]; search: string }) {
 
   const SortHeader = ({ col, label, width }: { col: keyof SKU; label: string; width?: string }) => (
     <th
-      className="section-label px-4 py-2 text-left cursor-pointer select-none"
-      style={{ width }}
+      className="px-4 py-2.5 text-left cursor-pointer select-none text-xs"
+      style={{ width, color: 'var(--fg-muted)', fontWeight: 500 }}
       onClick={() => handleSort(col)}
     >
       {label} {sortBy === col ? (sortDir === 'desc' ? '↓' : '↑') : ''}
@@ -152,17 +152,17 @@ function TableView({ skus, search }: { skus: SKU[]; search: string }) {
   )
 
   return (
-    <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
-      <table className="w-full text-xs">
+    <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)', overflow: 'hidden' }}>
+      <table className="w-full text-sm">
         <thead>
           <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg)' }}>
-            <SortHeader col="id" label="SKU" width="100px" />
-            <SortHeader col="name" label="NAME" />
-            <SortHeader col="currentStock" label="STOCK" width="120px" />
-            <SortHeader col="shelf" label="SHELF" width="100px" />
-            <SortHeader col="lastRestock" label="LAST RESTOCK" width="140px" />
-            <SortHeader col="velocity" label="VELOCITY" width="100px" />
-            <SortHeader col="oosRisk" label="OOS RISK" width="100px" />
+            <SortHeader col="id" label="Code" width="100px" />
+            <SortHeader col="name" label="Product" />
+            <SortHeader col="currentStock" label="Stock" width="160px" />
+            <SortHeader col="shelf" label="Shelf" width="100px" />
+            <SortHeader col="lastRestock" label="Last restocked" width="140px" />
+            <SortHeader col="velocity" label="Sells per hour" width="120px" />
+            <SortHeader col="oosRisk" label="Status" width="120px" />
           </tr>
         </thead>
         <tbody>
@@ -179,18 +179,20 @@ function TableView({ skus, search }: { skus: SKU[]; search: string }) {
                 </Link>
               </td>
               <td className="px-4" style={{ color: 'var(--fg)' }}>{sku.name}</td>
-              <td className="px-4 w-32">
+              <td className="px-4">
                 <StockBar current={sku.currentStock} max={sku.maxStock} />
               </td>
-              <td className="px-4 data-mono" style={{ color: 'var(--fg-muted)' }}>{sku.shelf}</td>
-              <td className="px-4 data-mono" style={{ color: 'var(--fg-dim)' }}>
-                {format(sku.lastRestock, 'MMM d HH:mm')}
+              <td className="px-4" style={{ color: 'var(--fg-muted)' }}>{sku.shelf}</td>
+              <td className="px-4 text-xs" style={{ color: 'var(--fg-muted)' }}>
+                {format(sku.lastRestock, 'MMM d, h:mm a')}
               </td>
-              <td className="px-4 data-mono" style={{ color: 'var(--fg-muted)' }}>{sku.velocity}/h</td>
+              <td className="px-4" style={{ color: 'var(--fg-muted)' }}>{sku.velocity}</td>
               <td className="px-4">
                 <span className="flex items-center gap-1.5">
-                  <span style={{ fontSize: 7, color: RISK_COLORS[sku.oosRisk] }}>●</span>
-                  <span className="data-mono text-xs" style={{ color: RISK_COLORS[sku.oosRisk] }}>{sku.oosRisk}</span>
+                  <span style={{ fontSize: 8, color: RISK_COLORS[sku.oosRisk] }}>●</span>
+                  <span className="text-xs" style={{ color: RISK_COLORS[sku.oosRisk], textTransform: 'capitalize' }}>
+                    {sku.oosRisk === 'low' ? 'Healthy' : sku.oosRisk === 'medium' ? 'Watch' : sku.oosRisk === 'high' ? 'Low' : 'Critical'}
+                  </span>
                 </span>
               </td>
             </tr>
@@ -212,10 +214,10 @@ export default function InventoryPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>
-            Real-time <em>inventory</em>
+            Stock
           </h1>
-          <p className="data-mono text-xs mt-1" style={{ color: 'var(--fg-dim)' }}>
-            {SKUS.length} SKUs tracked · {criticalCount} at risk
+          <p className="text-sm mt-1" style={{ color: 'var(--fg-muted)' }}>
+            Tracking {SKUS.length} products · {criticalCount} {criticalCount === 1 ? 'is' : 'are'} running low
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -251,20 +253,20 @@ export default function InventoryPage() {
       {criticalCount > 0 && (
         <div
           className="flex flex-col gap-2 p-4"
-          style={{ border: '1px solid rgba(248,113,113,0.3)', background: 'rgba(248,113,113,0.05)' }}
+          style={{ borderRadius: 'var(--radius)', border: '1px solid rgba(248,113,113,0.3)', background: 'rgba(248,113,113,0.05)' }}
         >
           <div className="flex items-center gap-2">
             <AlertTriangle size={14} style={{ color: 'var(--danger)' }} />
-            <span className="section-label" style={{ color: 'var(--danger)' }}>OOS PREDICTIONS</span>
+            <span className="text-sm font-medium" style={{ color: 'var(--danger)' }}>About to run out</span>
           </div>
           <div className="flex flex-col gap-1">
             {SKUS.filter((s) => s.oosRisk === 'critical').slice(0, 3).map((sku) => (
-              <p key={sku.id} className="data-mono text-xs" style={{ color: 'var(--fg-muted)' }}>
-                <span style={{ color: 'var(--fg)' }}>{sku.id}</span> ({sku.name}) will run out in{' '}
+              <p key={sku.id} className="text-sm" style={{ color: 'var(--fg-muted)' }}>
+                <span style={{ color: 'var(--fg)', fontWeight: 500 }}>{sku.name}</span> ({sku.id}) will run out in{' '}
                 <span style={{ color: 'var(--danger)' }}>
-                  {Math.round((sku.currentStock / (sku.velocity || 1)) * 60)}m
+                  about {Math.round((sku.currentStock / (sku.velocity || 1)) * 60)} min
                 </span>{' '}
-                based on current velocity · {sku.shelf}
+                — on {sku.shelf}
               </p>
             ))}
           </div>
@@ -273,8 +275,8 @@ export default function InventoryPage() {
 
       {/* Main view */}
       <SectionHeader
-        number="01"
-        title={view === 'grid' ? 'PLANOGRAM VIEW' : 'SKU TABLE'}
+        title={view === 'grid' ? 'Shelves' : 'All products'}
+        description={view === 'grid' ? 'Where things are and how full the shelves are' : 'Search, sort, and check stock levels'}
       />
       {view === 'grid' ? <GridView /> : <TableView skus={SKUS} search={search} />}
     </div>
