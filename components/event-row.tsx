@@ -76,8 +76,8 @@ export function EventRow({ event, isSelected, onClick, flash }: EventRowProps) {
       <Link
         href={`/events/${event.id}`}
         onClick={(e) => e.stopPropagation()}
-        className="text-xs font-medium shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-        style={{ color: 'var(--brand-accent)', width: 60, textAlign: 'right' }}
+        className="text-xs font-medium shrink-0 opacity-100 transition-opacity duration-150 sm:opacity-0 sm:group-hover:opacity-100"
+        style={{ color: 'var(--brand-accent)', minWidth: 52, textAlign: 'right' }}
       >
         {action} →
       </Link>

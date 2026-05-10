@@ -300,28 +300,29 @@ export function Topbar() {
   return (
     <>
       <header
-        className="sticky top-0 z-40 flex items-center gap-3 px-3 md:px-4 border-b"
+        className="sticky top-0 z-40 flex min-w-0 items-center gap-2 border-b px-3 md:gap-3 md:px-4"
         style={{ height: 52, background: 'var(--bg)' }}
       >
-        <SidebarTrigger className="-ml-1" />
+        <SidebarTrigger className="-ml-1 shrink-0" />
 
-        <div className="flex-1 hidden sm:block">
+        <div className="hidden min-w-0 flex-1 sm:block">
           <Breadcrumb />
         </div>
 
-        {/* Command palette trigger */}
-        <button
-          onClick={() => setCmdOpen(true)}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors bg-muted/60 hover:bg-muted border border-border text-muted-foreground text-xs"
-        >
-          <Search size={13} />
-          <span className="hidden sm:block">Search anything…</span>
-          <kbd className="hidden md:block px-1 py-0.5 rounded text-[10px] bg-background border border-border font-mono">
-            ⌘K
-          </kbd>
-        </button>
+        <div className="ml-auto flex min-w-0 shrink-0 items-center gap-1 sm:gap-2">
+          {/* Command palette trigger */}
+          <button
+            type="button"
+            onClick={() => setCmdOpen(true)}
+            className="flex items-center gap-2 rounded-md border border-border bg-muted/60 px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted sm:px-3"
+          >
+            <Search size={13} />
+            <span className="hidden sm:inline">Search anything…</span>
+            <kbd className="hidden rounded border border-border bg-background px-1 py-0.5 font-mono text-[10px] md:block">
+              ⌘K
+            </kbd>
+          </button>
 
-        <div className="flex items-center gap-1">
           <NotificationsMenu />
           <UserMenu />
         </div>

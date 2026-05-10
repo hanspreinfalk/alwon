@@ -91,8 +91,11 @@ function BusiestTimesBar({ date }: { date: Date }) {
         <span>{busiestHour.visitors} visitors</span>
       </p>
 
-      {/* Chart area */}
-      <div className="flex items-end gap-px relative" style={{ height: 88 }}>
+      {/* Scroll horizontally on narrow viewports so 24 bars stay readable */}
+      <div className="-mx-1 overflow-x-auto overflow-y-visible px-1 pb-1 [scrollbar-width:thin]">
+        <div className="min-w-[520px]">
+          {/* Chart area */}
+          <div className="relative flex items-end gap-px" style={{ height: 88 }}>
         {hourlyTotals.map(({ hour, total, visitors }) => {
           const pct = maxVal > 0 ? total / maxVal : 0
           const isBusiest = hour === busiestHour.hour
@@ -161,13 +164,15 @@ function BusiestTimesBar({ date }: { date: Date }) {
             </div>
           )
         })}
-      </div>
+          </div>
 
-      {/* X-axis labels */}
-      <div className="flex justify-between mt-2">
-        {['12 am', '6 am', '12 pm', '6 pm', '11 pm'].map((l) => (
-          <span key={l} className="text-[11px] text-muted-foreground">{l}</span>
-        ))}
+          {/* X-axis labels */}
+          <div className="mt-2 flex justify-between">
+            {['12 am', '6 am', '12 pm', '6 pm', '11 pm'].map((l) => (
+              <span key={l} className="text-[11px] text-muted-foreground">{l}</span>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -276,13 +281,13 @@ function DownloadReportDialog({
           </div>
         </div>
 
-        <DialogFooter className="px-6 py-4 border-t bg-muted/30 flex-row gap-2">
-          <Button variant="ghost" size="sm" className="text-xs" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="flex-col-reverse gap-2 border-t bg-muted/30 px-6 py-4 sm:flex-row">
+          <Button variant="ghost" size="sm" className="text-xs w-full sm:w-auto" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button
             size="sm"
-            className="text-xs gap-1.5 flex-1"
+            className="w-full flex-1 gap-1.5 text-xs sm:w-auto"
             disabled={selected.length === 0}
             onClick={() => onOpenChange(false)}
             style={{ background: 'var(--brand-accent)', color: '#fff' }}
@@ -302,7 +307,7 @@ function DatePicker({ date, onChange }: { date: Date; onChange: (d: Date) => voi
   const isViewingToday = isToday(date)
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex w-full flex-wrap items-center justify-center gap-1 sm:w-auto sm:justify-start">
       {/* Prev day */}
       <button
         onClick={() => onChange(subDays(date, 1))}
@@ -332,7 +337,7 @@ function DatePicker({ date, onChange }: { date: Date; onChange: (d: Date) => voi
             {isViewingToday ? 'Today' : format(date, 'MMM d, yyyy')}
           </button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 rounded-xl" align="end">
+        <PopoverContent className="w-auto max-w-[calc(100vw-2rem)] p-0 rounded-xl" align="center">
           <Calendar
             mode="single"
             selected={date}
@@ -419,29 +424,30 @@ export default function DashboardPage() {
   return (
     <>
     <DownloadReportDialog open={reportOpen} onOpenChange={setReportOpen} date={selectedDate} />
-    <div className="flex flex-col gap-5 flex-1 min-h-0">
+    <div className="flex flex-col gap-4 sm:gap-5 flex-1 min-h-0">
 
       {/* ── Header ─── */}
-      <div className="flex items-start justify-between flex-shrink-0 gap-4">
-        <div>
-          <h1 className="text-[18px] font-semibold tracking-tight">{greeting}</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+      <div className="flex flex-shrink-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="min-w-0">
+          <h1 className="text-[17px] font-semibold tracking-tight sm:text-[18px]">{greeting}</h1>
+          <p className="mt-0.5 text-xs text-muted-foreground sm:text-sm">
             {viewingToday
               ? `${format(selectedDate, 'EEEE, MMMM d')} · All your stores at a glance`
               : `${format(selectedDate, 'EEEE, MMMM d, yyyy')} · Historical view`
             }
           </p>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex w-full flex-shrink-0 flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
           <DatePicker date={selectedDate} onChange={setSelectedDate} />
           <Button
             variant="outline"
             size="sm"
-            className="text-xs h-8 rounded-lg gap-1.5"
+            className="h-8 gap-1.5 rounded-lg text-xs sm:w-auto"
             onClick={() => setReportOpen(true)}
           >
             <Download size={13} />
-            Download report
+            <span className="hidden min-[360px]:inline">Download report</span>
+            <span className="min-[360px]:hidden">Report</span>
           </Button>
         </div>
       </div>
@@ -449,21 +455,24 @@ export default function DashboardPage() {
       {/* Past-date banner */}
       {!viewingToday && (
         <div
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl border text-xs flex-shrink-0"
+          className="flex flex-shrink-0 flex-col gap-2 rounded-xl border px-3 py-2.5 text-xs sm:flex-row sm:items-center sm:gap-3 sm:px-4"
           style={{
             background: 'var(--brand-accent-glow)',
             borderColor: 'var(--border-accent)',
             color: 'var(--brand-accent)',
           }}
         >
-          <CalendarDays size={13} />
-          <span>
-            Viewing historical data for <strong>{format(selectedDate, 'EEEE, MMMM d, yyyy')}</strong>.
-            The live event stream below shows today&apos;s activity.
-          </span>
+          <div className="flex min-w-0 items-start gap-2 sm:items-center">
+            <CalendarDays size={13} className="mt-0.5 shrink-0 sm:mt-0" />
+            <span className="leading-snug">
+              Viewing historical data for <strong>{format(selectedDate, 'EEEE, MMMM d, yyyy')}</strong>.
+              The live event stream below shows today&apos;s activity.
+            </span>
+          </div>
           <button
+            type="button"
             onClick={() => setSelectedDate(startOfDay(new Date()))}
-            className="ml-auto font-medium underline underline-offset-2 opacity-80 hover:opacity-100 transition-opacity"
+            className="shrink-0 self-start font-medium underline underline-offset-2 opacity-80 transition-opacity hover:opacity-100 sm:ml-auto sm:self-center"
           >
             Back to today
           </button>
@@ -471,7 +480,7 @@ export default function DashboardPage() {
       )}
 
       {/* ── Stat tiles ─── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 flex-shrink-0">
+      <div className="grid flex-shrink-0 grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4">
         {statTiles.map((tile) => {
           const Icon = tile.icon
           return (
@@ -479,18 +488,18 @@ export default function DashboardPage() {
               key={tile.label}
               onClick={'onClick' in tile && tile.onClick ? () => router.push('/settings?tab=cameras') : undefined}
               className={cn(
-                'flex flex-col gap-3 p-4 rounded-xl bg-card ring-1 ring-foreground/10',
+                'flex flex-col gap-2 rounded-xl bg-card p-3 ring-1 ring-foreground/10 sm:gap-3 sm:p-4',
                 'onClick' in tile && tile.onClick ? 'cursor-pointer hover:bg-muted/30 transition-colors' : ''
               )}
             >
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground font-medium">{tile.label}</span>
-                <div className="flex items-center justify-center rounded-md size-7 bg-muted text-muted-foreground">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] font-medium leading-tight text-muted-foreground sm:text-xs">{tile.label}</span>
+                <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
                   <Icon size={14} />
                 </div>
               </div>
               <div>
-                <span className="text-2xl font-bold tabular-nums tracking-tight leading-none">{tile.value}</span>
+                <span className="text-xl font-bold tabular-nums leading-none tracking-tight sm:text-2xl">{tile.value}</span>
                 {'delta' in tile && tile.delta !== undefined ? (
                   <p className={cn(
                     'flex items-center gap-0.5 text-xs mt-1.5',
@@ -513,45 +522,44 @@ export default function DashboardPage() {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-semibold">Busiest times of day</CardTitle>
         </CardHeader>
-        <CardContent className="pt-0">
+        <CardContent className="px-3 pt-0 sm:px-6">
           <BusiestTimesBar date={selectedDate} />
         </CardContent>
       </Card>
 
       {/* ── Main grid ─── */}
-      <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-4">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 lg:grid-cols-[3fr_2fr]">
 
         {/* Live event stream */}
-        <Card className="overflow-hidden p-0 gap-0 rounded-xl">
-          <CardHeader className="px-5 pt-4 pb-3 flex-shrink-0 border-b">
+        <Card className="gap-0 overflow-hidden rounded-xl p-0">
+          <CardHeader className="flex-shrink-0 border-b px-4 pb-3 pt-4 sm:px-5">
             <div>
               <CardTitle className="text-sm font-semibold">
                 {viewingToday ? "What's happening now" : 'Recent activity'}
               </CardTitle>
-              <CardDescription className="text-xs mt-0.5">Live activity across all your stores</CardDescription>
+              <CardDescription className="mt-0.5 text-xs">Live activity across all your stores</CardDescription>
             </div>
             <CardAction>
-              <Button variant="ghost" size="sm" asChild className="text-xs h-7 gap-1 text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" size="sm" asChild className="h-7 gap-1 text-xs text-muted-foreground hover:text-foreground">
                 <Link href="/events">See all <ArrowRight size={12} /></Link>
               </Button>
             </CardAction>
           </CardHeader>
-          {/* 9 rows × 48 px each */}
-          <div style={{ height: 384 }} className="overflow-hidden">
+          <div className="h-[280px] overflow-hidden sm:h-[340px] lg:h-96">
             <EventStream limit={30} />
           </div>
         </Card>
 
         {/* Right panel — single merged card */}
-        <Card className="overflow-hidden flex-shrink-0 rounded-xl p-0 gap-0">
+        <Card className="flex-shrink-0 gap-0 overflow-hidden rounded-xl p-0">
           {/* Card header */}
-          <CardHeader className="px-4 py-3 border-b">
+          <CardHeader className="border-b px-4 py-3">
             <div>
               <CardTitle className="text-sm font-semibold">Needs attention</CardTitle>
-              <CardDescription className="text-xs mt-0.5">Flagged events that need review</CardDescription>
+              <CardDescription className="mt-0.5 text-xs">Flagged events that need review</CardDescription>
             </div>
             <CardAction>
-              <Button variant="ghost" size="sm" asChild className="text-xs h-7 gap-1 text-muted-foreground hover:text-foreground">
+              <Button variant="ghost" size="sm" asChild className="h-7 gap-1 text-xs text-muted-foreground hover:text-foreground">
                 <Link href="/loss-prevention">Open all <ArrowRight size={12} /></Link>
               </Button>
             </CardAction>
@@ -563,17 +571,17 @@ export default function DashboardPage() {
               <Link
                 key={item.id}
                 href={`/events/${item.id}`}
-                className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted/50 transition-colors border-b"
+                className="flex min-h-[52px] items-center gap-2 border-b px-3 py-2.5 transition-colors hover:bg-muted/50 sm:gap-3 sm:px-4"
               >
-                <div className="flex items-center justify-center rounded-md shrink-0 size-8 bg-destructive/8 border border-destructive/15 text-destructive">
+                <div className="flex size-8 shrink-0 items-center justify-center rounded-md border border-destructive/15 bg-destructive/8 text-destructive">
                   <Play size={11} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate leading-tight">{friendlyEvent(item.type as EventType)}</p>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">{item.camera} · {item.time}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium leading-tight">{friendlyEvent(item.type as EventType)}</p>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">{item.camera} · {item.time}</p>
                 </div>
-                <div className="flex flex-col items-end gap-0.5 shrink-0">
-                  <Badge variant="destructive" className="text-[10px] px-1.5 font-semibold">{Math.round(item.conf * 100)}%</Badge>
+                <div className="flex shrink-0 flex-col items-end gap-0.5">
+                  <Badge variant="destructive" className="px-1.5 text-[10px] font-semibold">{Math.round(item.conf * 100)}%</Badge>
                   {item.value && <span className="text-[11px] text-muted-foreground">{item.value}</span>}
                 </div>
               </Link>
