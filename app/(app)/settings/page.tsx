@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { Plus, Search, UserPlus } from 'lucide-react'
+import { Play, Plus, Search, UserPlus, WifiOff, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { DETECTION_RULES } from '@/lib/mock-data'
+import { cn } from '@/lib/utils'
 
 type Tab = 'account' | 'team' | 'cameras' | 'rules' | 'integrations' | 'billing'
 
@@ -284,11 +285,97 @@ function buildInitialCameras(): CameraRow[] {
   }))
 }
 
+function CameraLivePanel({ camera, onClose }: { camera: CameraRow; onClose: () => void }) {
+  const isLive = camera.status === 'online'
+
+  return (
+    <div className="flex h-full min-h-0 min-w-0 flex-col bg-card">
+      <div className="flex shrink-0 items-start justify-between gap-3 border-b bg-muted/30 px-4 py-3">
+        <div className="min-w-0">
+          <h3 className="truncate font-mono text-sm font-semibold tracking-tight">{camera.id}</h3>
+          <p className="truncate text-xs text-muted-foreground">{camera.location}</p>
+        </div>
+        <Button type="button" variant="ghost" size="icon-sm" className="shrink-0" onClick={onClose}>
+          <X className="size-4" />
+        </Button>
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
+        {isLive ? (
+          <>
+            <div
+              className={cn(
+                'relative w-full overflow-hidden rounded-xl border bg-black shadow-sm',
+                'aspect-video min-h-[200px]',
+              )}
+            >
+              <div className="pointer-events-none absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-md bg-red-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                <span className="size-1.5 animate-pulse rounded-full bg-white" />
+                Live
+              </div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  className="size-14 rounded-full shadow-md"
+                  onClick={() =>
+                    toast.info('Connecting to stream…', {
+                      description: `${camera.id} · ${camera.location}`,
+                    })
+                  }
+                >
+                  <Play className="size-6 ml-0.5" />
+                </Button>
+                <p className="px-4 text-center font-mono text-xs text-white/50">
+                  {camera.id} · preview
+                </p>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 flex items-center gap-2 border-t border-white/10 bg-black/80 px-3 py-2.5">
+                <span className="font-mono text-[10px] text-white/45">Live</span>
+                <div className="relative h-1 flex-1 rounded-full bg-white/15">
+                  <div className="h-full w-full animate-pulse rounded-full bg-primary/40" />
+                </div>
+                <span className="font-mono text-[10px] text-white/45">HD</span>
+              </div>
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Stream is encrypted end-to-end. If video stalls, check network at the store edge.
+            </p>
+          </>
+        ) : (
+          <div className="flex aspect-video min-h-[200px] flex-col items-center justify-center gap-3 rounded-xl border bg-muted/40 px-4 text-center">
+            <div className="flex size-12 items-center justify-center rounded-full bg-muted">
+              <WifiOff className="size-6 text-muted-foreground" />
+            </div>
+            <div>
+              <p className="text-sm font-medium">Camera offline</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                No live stream · last seen {camera.lastPing}
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-1"
+              onClick={() => toast.info('Reconnect requested', { description: camera.id })}
+            >
+              Request reconnect
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function CamerasTab() {
   const [cameras, setCameras] = useState<CameraRow[]>(buildInitialCameras)
   const [query, setQuery] = useState('')
   const [addOpen, setAddOpen] = useState(false)
   const [newLocation, setNewLocation] = useState('')
+  const [selectedCameraId, setSelectedCameraId] = useState<string | null>(null)
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -326,6 +413,10 @@ function CamerasTab() {
     setNewLocation('')
   }
 
+  const selectedCamera = selectedCameraId
+    ? cameras.find((c) => c.id === selectedCameraId)
+    : undefined
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -345,37 +436,79 @@ function CamerasTab() {
         </Button>
       </div>
 
-      <Card className="p-0 gap-0 overflow-hidden">
-        <div className="flex items-center gap-3 px-4 py-2.5 border-b bg-muted/50">
-          <span className="text-xs text-muted-foreground font-medium w-20">Camera</span>
-          <span className="text-xs text-muted-foreground font-medium flex-1">Where</span>
-          <span className="text-xs text-muted-foreground font-medium w-20 text-right">Status</span>
-          <span className="text-xs text-muted-foreground font-medium w-24 text-right">Last seen</span>
+      <div
+        className="flex min-h-[min(520px,calc(100vh-320px))] flex-row overflow-hidden rounded-xl border"
+        style={{ borderColor: 'var(--border)', background: 'var(--card)' }}
+      >
+        <div
+          className={cn(
+            'flex h-full min-h-0 min-w-0 flex-col overflow-hidden transition-[width] duration-200',
+            selectedCamera ? 'w-[42%] shrink-0' : 'w-full flex-1',
+          )}
+        >
+          <div className="flex shrink-0 items-center gap-3 border-b bg-muted/50 px-4 py-2.5">
+            <span className="w-20 text-xs font-medium text-muted-foreground">Camera</span>
+            <span className="min-w-0 flex-1 text-xs font-medium text-muted-foreground">Where</span>
+            <span className="w-20 text-right text-xs font-medium text-muted-foreground">Status</span>
+            <span className="hidden w-24 text-right text-xs font-medium text-muted-foreground sm:block">
+              Last seen
+            </span>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+            {filtered.length === 0 ? (
+              <div className="px-4 py-10 text-center text-sm text-muted-foreground">
+                No cameras match your search.
+              </div>
+            ) : (
+              filtered.map((cam) => {
+                const isSelected = selectedCameraId === cam.id
+                return (
+                  <button
+                    key={cam.id}
+                    type="button"
+                    onClick={() => setSelectedCameraId(isSelected ? null : cam.id)}
+                    className={cn(
+                      'flex w-full items-center gap-3 border-b px-4 py-3 text-left transition-colors hover:bg-muted/40',
+                      isSelected && 'bg-muted/40',
+                    )}
+                    style={{
+                      borderColor: 'var(--border)',
+                      borderLeft: isSelected ? '2px solid var(--foreground)' : '2px solid transparent',
+                    }}
+                  >
+                    <span className="w-20 shrink-0 font-mono text-xs font-medium">{cam.id}</span>
+                    <span className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{cam.location}</span>
+                    <span className="flex w-20 shrink-0 justify-end">
+                      <span className="flex items-center gap-1.5">
+                        <span
+                          className={`size-1.5 shrink-0 rounded-full ${cam.status === 'online' ? 'bg-green-500' : 'bg-red-500'}`}
+                        />
+                        <span
+                          className={`text-xs ${cam.status === 'online' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                        >
+                          {cam.status === 'online' ? 'Online' : 'Offline'}
+                        </span>
+                      </span>
+                    </span>
+                    <span className="hidden w-24 shrink-0 text-right text-xs text-muted-foreground sm:inline">
+                      {cam.lastPing}
+                    </span>
+                  </button>
+                )
+              })
+            )}
+          </div>
         </div>
-        {filtered.length === 0 ? (
-          <div className="px-4 py-10 text-center text-sm text-muted-foreground">No cameras match your search.</div>
-        ) : (
-          filtered.map((cam) => (
-            <div
-              key={cam.id}
-              className="flex items-center gap-3 px-4 border-b hover:bg-muted/40 transition-colors"
-              style={{ height: 48 }}
-            >
-              <span className="font-mono text-xs w-20 font-medium">{cam.id}</span>
-              <span className="text-sm flex-1 text-muted-foreground">{cam.location}</span>
-              <span className="w-20 flex justify-end">
-                <span className="flex items-center gap-1.5">
-                  <span className={`size-1.5 rounded-full shrink-0 ${cam.status === 'online' ? 'bg-green-500' : 'bg-red-500'}`} />
-                  <span className={`text-xs ${cam.status === 'online' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                    {cam.status === 'online' ? 'Online' : 'Offline'}
-                  </span>
-                </span>
-              </span>
-              <span className="text-xs w-24 text-right text-muted-foreground">{cam.lastPing}</span>
-            </div>
-          ))
+
+        {selectedCamera && (
+          <div
+            className="flex h-full min-h-0 min-w-0 w-[58%] shrink-0 flex-col overflow-hidden border-l"
+            style={{ borderColor: 'var(--border)' }}
+          >
+            <CameraLivePanel camera={selectedCamera} onClose={() => setSelectedCameraId(null)} />
+          </div>
         )}
-      </Card>
+      </div>
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>
