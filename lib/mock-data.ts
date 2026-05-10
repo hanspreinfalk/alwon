@@ -58,6 +58,8 @@ const EVENT_TYPES: EventType[] = [
   'payment-success',
   'payment-failover',
   'cart-tampering',
+  'camera-offline',
+  'camera-degraded',
 ]
 
 const SEVERITY_WEIGHTS: { severity: EventSeverity; weight: number }[] = [
@@ -94,6 +96,9 @@ function sourceForType(type: EventType): string {
     case 'payment-success':
     case 'payment-failover':
       return `POS-${randInt(1, 12).toString().padStart(2, '0')}`
+    case 'camera-offline':
+    case 'camera-degraded':
+      return pick(CAMERA_IDS)
     default:
       return pick(CAMERA_IDS)
   }
@@ -123,6 +128,18 @@ function metadataForType(type: EventType): Record<string, string> {
       return { from: pick(['Stripe', 'MP']), to: pick(['Prisma', 'EBANX']), amount: `$${rand(10, 300).toFixed(2)}` }
     case 'cart-tampering':
       return { conf: rand(0.6, 0.95).toFixed(2), items_removed: String(randInt(1, 5)) }
+    case 'camera-offline':
+      return {
+        duration: `${randInt(1, 45)}m`,
+        last_seen: `${randInt(1, 60)}m ago`,
+        issue: pick(['Connection lost', 'Power failure', 'Network timeout', 'Hardware fault']),
+      }
+    case 'camera-degraded':
+      return {
+        signal: String(randInt(15, 55)),
+        duration: `${randInt(1, 30)}m`,
+        issue: pick(['Low bandwidth', 'Packet loss', 'High latency', 'Interference detected']),
+      }
     default:
       return {}
   }
@@ -163,7 +180,7 @@ export function generateStores(): Store[] {
     revenue: randInt(4000, 28000),
     cameraCount: randInt(12, 32),
     camerasOnline: 0,
-    manager: pick(['Elena M.', 'Carlos R.', 'Sofia T.', 'Diego P.', 'Ana L.', 'Javier S.']),
+    manager: pick(['Santiago G.', 'Carlos R.', 'Sofia T.', 'Diego P.', 'Ana L.', 'Javier S.']),
     lastSync: subMinutes(new Date(), randInt(0, 5)),
     sparkline: Array.from({ length: 12 }, () => randInt(50, 400)),
   })).map((s) => ({
@@ -320,6 +337,54 @@ export function getDashboardMetrics() {
   }
 }
 
+// Deterministic pseudo-random seeded from a date (so same date → same numbers).
+function seededRand(seed: number, min: number, max: number): number {
+  const x = Math.sin(seed + 1) * 10000
+  const r = x - Math.floor(x)
+  return min + r * (max - min)
+}
+
+export function getDashboardMetricsForDate(date: Date) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  const isToday = d.getTime() === today.getTime()
+
+  if (isToday) return getDashboardMetrics()
+
+  // Seed based on days since epoch for determinism
+  const seed = Math.floor(d.getTime() / 86_400_000)
+
+  const eventsProcessed = Math.round(seededRand(seed * 3, 8000, 16000))
+  const prevDay = Math.round(seededRand((seed - 1) * 3, 8000, 16000))
+  const eventsProcessedDelta = parseFloat(((eventsProcessed - prevDay) / prevDay * 100).toFixed(1))
+  const shrinkPrevented = Math.round(seededRand(seed * 7, 1200, 3800))
+  const walkouts = Math.round(seededRand(seed * 11, 180, 480))
+  const totalCheckouts = Math.round(seededRand(seed * 13, 5000, 9000))
+  const walkoutPct = parseFloat((walkouts / totalCheckouts * 100).toFixed(1))
+  const paymentSuccessRate = parseFloat((seededRand(seed * 17, 98.2, 99.9)).toFixed(1))
+  const paymentFailovers = Math.round(seededRand(seed * 19, 2, 18))
+  const activeCameras = 30 - Math.round(seededRand(seed * 23, 0, 4))
+
+  return {
+    eventsProcessed,
+    eventsProcessedDelta,
+    shrinkPrevented,
+    shrinkSparkline: Array.from({ length: 9 }, (_, i) =>
+      Math.round(seededRand(seed * 29 + i, shrinkPrevented * 0.3, shrinkPrevented * 0.9))
+    ),
+    stockoutsResolved: Math.round(seededRand(seed * 31, 20, 80)),
+    avgResolutionTime: `${Math.round(seededRand(seed * 37, 2, 8))}m ${Math.round(seededRand(seed * 41, 5, 59))}s`,
+    walkouts,
+    walkoutPct,
+    paymentSuccessRate,
+    paymentFailovers,
+    activeCameras,
+    totalCameras: 30,
+  }
+}
+
 // --- heatmap ---
 
 export function generateHeatmapData(): number[][] {
@@ -331,6 +396,44 @@ export function generateHeatmapData(): number[][] {
       return Math.round(base)
     })
   )
+}
+
+export function generateHeatmapDataForDate(date: Date): number[][] {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  if (d.getTime() === today.getTime()) return generateHeatmapData()
+
+  const seed = Math.floor(d.getTime() / 86_400_000)
+  const hours = Array.from({ length: 24 }, (_, h) => h)
+  return STORE_IDS.map((_, si) =>
+    hours.map((h) => {
+      const base = h >= 9 && h <= 21
+        ? seededRand(seed * 43 + si * 100 + h, 30, 190)
+        : seededRand(seed * 43 + si * 100 + h, 0, 25)
+      return Math.round(base)
+    })
+  )
+}
+
+// Returns per-hour unique visitor counts (deterministic per date).
+export function generateVisitorDataForDate(date: Date): number[] {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+
+  const isToday = d.getTime() === today.getTime()
+  const seed = isToday ? Math.floor(today.getTime() / 86_400_000) : Math.floor(d.getTime() / 86_400_000)
+
+  return Array.from({ length: 24 }, (_, h) => {
+    const isOpen = h >= 8 && h <= 22
+    const base = isOpen
+      ? seededRand(seed * 59 + h * 13, 18, 160)
+      : seededRand(seed * 59 + h * 13, 0, 12)
+    return Math.round(base)
+  })
 }
 
 export function generatePaymentTimeSeries(): { time: string; rate: number }[] {

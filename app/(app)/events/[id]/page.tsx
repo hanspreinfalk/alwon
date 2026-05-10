@@ -127,7 +127,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             </div>
             <div className="flex flex-col gap-0">
               {[
-                { author: 'Elena M.', text: 'Confirmed from store walkthrough. Item not on shelf.', time: '14:32' },
+                { author: 'Santiago G.', text: 'Confirmed from store walkthrough. Item not on shelf.', time: '14:32' },
                 { author: 'Carlos R.', text: 'High confidence pick. Escalating to LP.', time: '14:38' },
               ].map((comment, i) => (
                 <div key={i} className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>

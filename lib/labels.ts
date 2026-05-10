@@ -13,6 +13,8 @@ export const EVENT_TYPE_LABELS: Record<EventType, string> = {
   'payment-success': 'Payment successful',
   'payment-failover': 'Payment retried',
   'cart-tampering': 'Cart change',
+  'camera-offline': 'Camera offline',
+  'camera-degraded': 'Degraded signal',
 }
 
 export const SEVERITY_LABELS: Record<EventSeverity, string> = {
@@ -68,4 +70,6 @@ export const EVENT_ACTIONS: Record<EventType, string> = {
   'payment-success': 'Open',
   'payment-failover': 'Review',
   'cart-tampering': 'Review',
+  'camera-offline': 'Inspect',
+  'camera-degraded': 'Inspect',
 }

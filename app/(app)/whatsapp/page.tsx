@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { format } from 'date-fns'
 import { Send } from 'lucide-react'
-import { SectionHeader } from '@/components/section-header'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { generateWhatsAppConversations } from '@/lib/mock-data'
 import type { WhatsAppConversation } from '@/lib/types'
 
@@ -27,67 +29,51 @@ function ConversationThread({ conv, onSend }: { conv: WhatsAppConversation; onSe
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
-      <div
-        className="px-4 py-3 shrink-0"
-        style={{ borderBottom: '1px solid var(--border)' }}
-      >
-        <p className="data-mono text-sm" style={{ color: 'var(--fg)' }}>{conv.customerId}</p>
-        <p className="data-mono text-xs mt-0.5" style={{ color: 'var(--fg-dim)' }}>
+      <div className="px-4 py-3 shrink-0 border-b">
+        <p className="font-mono text-sm font-medium">{conv.customerId}</p>
+        <p className="font-mono text-xs mt-0.5 text-muted-foreground">
           {conv.messages.length} messages · {conv.status}
         </p>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto flex flex-col gap-2 p-4">
-        {conv.messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex ${msg.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}
-          >
+      <ScrollArea className="flex-1">
+        <div className="flex flex-col gap-2 p-4">
+          {conv.messages.map((msg) => (
             <div
-              className="max-w-[75%] px-3 py-2 text-sm"
-              style={{
-                border: msg.direction === 'outbound'
-                  ? '1px solid var(--border-accent)'
-                  : '1px solid var(--border)',
-                background: msg.direction === 'outbound'
-                  ? 'rgba(6,144,252,0.06)'
-                  : 'var(--bg-elevated)',
-                color: 'var(--fg)',
-              }}
+              key={msg.id}
+              className={`flex ${msg.direction === 'outbound' ? 'justify-end' : 'justify-start'}`}
             >
-              <p>{msg.content}</p>
-              <p className="data-mono text-xs mt-1" style={{ color: 'var(--fg-dim)' }}>
-                {format(msg.timestamp, 'HH:mm')}
-              </p>
+              <div
+                className={`max-w-[75%] px-3 py-2 text-sm rounded-lg ${
+                  msg.direction === 'outbound'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-muted text-foreground'
+                }`}
+              >
+                <p>{msg.content}</p>
+                <p className="font-mono text-[10px] mt-1 opacity-60">
+                  {format(msg.timestamp, 'HH:mm')}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </ScrollArea>
 
       {/* Input */}
-      <div
-        className="px-4 py-3 shrink-0"
-        style={{ borderTop: '1px solid var(--border)' }}
-      >
-        <div className="flex gap-2" style={{ border: '1px solid var(--border-strong)' }}>
-          <input
+      <div className="px-4 py-3 shrink-0 border-t">
+        <div className="flex gap-2">
+          <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Type a message..."
-            className="flex-1 px-3 py-2 text-sm bg-transparent outline-none"
-            style={{ color: 'var(--fg)' }}
+            placeholder="Type a message…"
+            className="h-9 flex-1"
           />
-          <button
-            onClick={handleSend}
-            className="px-3 flex items-center justify-center transition-colors"
-            style={{ background: 'var(--brand-accent)', color: '#fff' }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--brand-accent-hover)' }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = 'var(--brand-accent)' }}
-          >
-            <Send size={14} />
-          </button>
+          <Button size="sm" className="h-9" onClick={handleSend} disabled={!input.trim()}>
+            <Send className="size-3.5" />
+          </Button>
         </div>
       </div>
     </div>
@@ -97,65 +83,52 @@ function ConversationThread({ conv, onSend }: { conv: WhatsAppConversation; onSe
 export default function WhatsAppPage() {
   const [selected, setSelected] = useState<WhatsAppConversation>(conversations[0])
 
+  const unreadCount = conversations.filter((c) => c.unreadCount > 0).length
+
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>
-          Messages
-        </h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--fg-muted)' }}>
-          {conversations.filter((c) => c.unreadCount > 0).length} unread {conversations.filter((c) => c.unreadCount > 0).length === 1 ? 'message' : 'messages'} from customers
+        <h1 className="text-[18px] font-semibold tracking-tight">Messages</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          {unreadCount} unread {unreadCount === 1 ? 'message' : 'messages'} from customers
         </p>
       </div>
 
-      <div
-        className="flex overflow-hidden"
-        style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', height: 600, overflow: 'hidden' }}
-      >
+      <div className="flex overflow-hidden rounded-xl border bg-card" style={{ height: 'calc(100vh - 52px - 48px - 80px)' }}>
         {/* Thread list */}
-        <div
-          className="flex flex-col overflow-y-auto shrink-0"
-          style={{ width: 260, borderRight: '1px solid var(--border)' }}
-        >
+        <div className="flex flex-col overflow-y-auto shrink-0 border-r" style={{ width: 260 }}>
           {conversations.map((conv) => (
             <button
               key={conv.id}
               onClick={() => setSelected(conv)}
-              className="flex items-start gap-3 px-4 py-3 text-left transition-colors"
+              className="flex items-start gap-3 px-4 py-3 text-left transition-colors border-b hover:bg-muted/40"
               style={{
-                borderBottom: '1px solid var(--border)',
-                background: selected?.id === conv.id ? 'var(--bg-hover)' : 'transparent',
-                borderLeft: selected?.id === conv.id ? '2px solid var(--brand-accent)' : '2px solid transparent',
-              }}
-              onMouseEnter={(e) => {
-                if (selected?.id !== conv.id) e.currentTarget.style.background = 'var(--bg-hover)'
-              }}
-              onMouseLeave={(e) => {
-                if (selected?.id !== conv.id) e.currentTarget.style.background = 'transparent'
+                background: selected?.id === conv.id ? 'var(--muted)' : undefined,
+                borderLeft: selected?.id === conv.id ? '2px solid var(--foreground)' : '2px solid transparent',
               }}
             >
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className="data-mono text-xs" style={{ color: 'var(--fg)' }}>{conv.customerId}</span>
+                  <span className="font-mono text-xs font-medium">{conv.customerId}</span>
                   {conv.unreadCount > 0 && (
-                    <span
-                      className="data-mono text-xs px-1.5 py-0.5 rounded-full"
-                      style={{ background: 'var(--brand-accent)', color: '#fff', fontSize: 9 }}
-                    >
+                    <span className="font-mono text-[9px] px-1.5 py-0.5 rounded-full bg-foreground text-background font-semibold">
                       {conv.unreadCount}
                     </span>
                   )}
                 </div>
-                <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--fg-dim)' }}>
+                <p className="text-xs mt-0.5 truncate text-muted-foreground">
                   {conv.lastMessage}
                 </p>
                 <div className="flex items-center justify-between mt-1">
-                  <span className="data-mono text-xs" style={{ color: 'var(--fg-dim)', fontSize: '0.6rem' }}>
+                  <span className="font-mono text-[10px] text-muted-foreground">
                     {format(conv.lastMessageTime, 'HH:mm')}
                   </span>
                   <span className="flex items-center gap-1">
-                    <span style={{ fontSize: 6, color: conv.status === 'open' ? 'var(--warning)' : conv.status === 'resolved' ? 'var(--success)' : 'var(--fg-dim)' }}>●</span>
-                    <span className="text-xs" style={{ color: 'var(--fg-muted)', fontSize: '0.65rem' }}>
+                    <span className={`size-1.5 rounded-full shrink-0 ${
+                      conv.status === 'open' ? 'bg-amber-500' :
+                      conv.status === 'resolved' ? 'bg-green-500' : 'bg-muted-foreground'
+                    }`} />
+                    <span className="text-[10px] text-muted-foreground">
                       {conv.status === 'open' ? 'Waiting' : conv.status === 'resolved' ? 'Done' : 'Pending'}
                     </span>
                   </span>
@@ -166,7 +139,7 @@ export default function WhatsAppPage() {
         </div>
 
         {/* Conversation */}
-        <div className="flex-1 overflow-hidden" style={{ background: 'var(--bg-panel)' }}>
+        <div className="flex-1 overflow-hidden bg-card">
           {selected ? (
             <ConversationThread
               conv={selected}
@@ -174,20 +147,17 @@ export default function WhatsAppPage() {
             />
           ) : (
             <div className="flex items-center justify-center h-full">
-              <p className="text-sm" style={{ color: 'var(--fg-muted)' }}>Choose a conversation to view it</p>
+              <p className="text-sm text-muted-foreground">Choose a conversation to view it</p>
             </div>
           )}
         </div>
 
         {/* Context panel */}
-        <div
-          className="hidden lg:flex flex-col overflow-y-auto shrink-0"
-          style={{ width: 240, borderLeft: '1px solid var(--border)' }}
-        >
+        <div className="hidden lg:flex flex-col overflow-y-auto shrink-0 border-l" style={{ width: 240 }}>
           {selected && (
             <>
-              <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-                <p className="text-sm font-medium" style={{ color: 'var(--fg)' }}>About this customer</p>
+              <div className="px-4 py-3 border-b">
+                <p className="text-sm font-semibold">About this customer</p>
               </div>
               <div className="flex flex-col gap-0 px-4 py-3">
                 {[
@@ -197,26 +167,19 @@ export default function WhatsAppPage() {
                   ['Last visit', 'Today, 11:24 AM'],
                   ['Status', selected.status === 'open' ? 'Waiting' : selected.status === 'resolved' ? 'Done' : 'Pending'],
                 ].map(([k, v]) => (
-                  <div key={k} className="flex justify-between py-2" style={{ borderBottom: '1px solid var(--border)' }}>
-                    <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>{k}</span>
-                    <span className="text-xs" style={{ color: 'var(--fg)' }}>{v}</span>
+                  <div key={k} className="flex justify-between py-2 border-b">
+                    <span className="text-xs text-muted-foreground">{k}</span>
+                    <span className="text-xs font-medium">{v}</span>
                   </div>
                 ))}
               </div>
-              <div className="px-4 py-3" style={{ borderTop: '1px solid var(--border)' }}>
-                <p className="text-sm font-medium mb-2" style={{ color: 'var(--fg)' }}>Suggested replies</p>
+              <div className="px-4 py-3 border-t">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-3">Suggested replies</p>
                 <div className="flex flex-col gap-2">
                   {AI_SUGGESTIONS.map((s, i) => (
                     <button
                       key={i}
-                      className="text-left text-xs px-2 py-2 rounded-sm transition-colors"
-                      style={{
-                        background: 'var(--bg-elevated)',
-                        border: '1px solid var(--border)',
-                        color: 'var(--fg-muted)',
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--border-accent)' }}
-                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)' }}
+                      className="text-left text-xs px-3 py-2 rounded-lg border bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border transition-colors"
                     >
                       {s}
                     </button>

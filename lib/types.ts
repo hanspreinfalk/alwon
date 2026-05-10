@@ -12,6 +12,8 @@ export type EventType =
   | 'payment-success'
   | 'payment-failover'
   | 'cart-tampering'
+  | 'camera-offline'
+  | 'camera-degraded'
 
 export interface StoreEvent {
   id: string

@@ -49,7 +49,7 @@
   - :root  = light  (base; no class needed)
   - .dark  = dark   (next-themes adds class="dark" to <html>)
   - next-themes removes .dark when light/system-light is active → :root wins
-  --brand-accent  = the blue accent used throughout UI components
+  --brand-accent  = main accent (shadcn black in light, white in dark)
   --accent        = shadcn slot (hover bg surface); kept separate to avoid collision
 */
 
@@ -59,45 +59,45 @@
     color-scheme: light;
 
     /* Alwon brand tokens */
-    --bg: #f4f6f8;
-    --bg-elevated: #ffffff;
-    --bg-panel: #ffffff;
-    --bg-hover: #edf0f3;
+    --bg: #ffffff;
+    --bg-elevated: #f7f9fb;
+    --bg-panel: #f7f9fb;
+    --bg-hover: #eff2f6;
     --fg: #0d1117;
     --fg-muted: #4a5568;
-    --fg-dim: #a0adb8;
-    --brand-accent: #0577d8;
-    --brand-accent-hover: #0568c0;
-    --brand-accent-glow: rgba(5, 119, 216, 0.12);
+    --fg-dim: #9aa3ae;
+    --brand-accent: #09090b;
+    --brand-accent-hover: #27272a;
+    --brand-accent-glow: rgba(9, 9, 11, 0.06);
     --success: #16a34a;
     --warning: #d97706;
     --danger: #dc2626;
-    --border: rgba(0, 0, 0, 0.08);
-    --border-strong: rgba(0, 0, 0, 0.15);
-    --border-accent: rgba(5, 119, 216, 0.35);
+    --border: rgba(0, 0, 0, 0.07);
+    --border-strong: rgba(0, 0, 0, 0.13);
+    --border-accent: rgba(9, 9, 11, 0.18);
 
-    /* shadcn tokens (no --accent clash — uses --accent as surface) */
-    --background: #f4f6f8;
+    /* shadcn tokens */
+    --background: #ffffff;
     --foreground: #0d1117;
     --card: #ffffff;
     --card-foreground: #0d1117;
     --popover: #ffffff;
     --popover-foreground: #0d1117;
-    --primary: #0577d8;
-    --primary-foreground: #ffffff;
-    --secondary: #edf0f3;
+    --primary: #09090b;
+    --primary-foreground: #fafafa;
+    --secondary: #f0f3f7;
     --secondary-foreground: #0d1117;
-    --muted: #edf0f3;
+    --muted: #f0f3f7;
     --muted-foreground: #4a5568;
-    --accent: #edf0f3;
+    --accent: #eff2f6;
     --accent-foreground: #0d1117;
     --destructive: #dc2626;
-    --border: rgba(0, 0, 0, 0.08);
-    --input: rgba(0, 0, 0, 0.06);
-    --ring: rgba(5, 119, 216, 0.35);
+    --border: rgba(0, 0, 0, 0.07);
+    --input: rgba(0, 0, 0, 0.05);
+    --ring: rgba(9, 9, 11, 0.25);
     --radius: 0.5rem;
 
-    --chart-1: #0577d8;
+    --chart-1: #09090b;
     --chart-2: #16a34a;
     --chart-3: #d97706;
     --chart-4: #dc2626;
@@ -105,12 +105,12 @@
 
     --sidebar: #ffffff;
     --sidebar-foreground: #0d1117;
-    --sidebar-primary: #0577d8;
-    --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #edf0f3;
+    --sidebar-primary: #09090b;
+    --sidebar-primary-foreground: #fafafa;
+    --sidebar-accent: #eaedf2;
     --sidebar-accent-foreground: #0d1117;
-    --sidebar-border: rgba(0, 0, 0, 0.08);
-    --sidebar-ring: rgba(5, 119, 216, 0.35);
+    --sidebar-border: rgba(0, 0, 0, 0.07);
+    --sidebar-ring: rgba(9, 9, 11, 0.25);
   }
 
   /* ─── DARK THEME (.dark class on <html>) ─────────────────────── */
@@ -118,56 +118,56 @@
     color-scheme: dark;
 
     /* Alwon brand tokens */
-    --bg: #05070a;
-    --bg-elevated: #0a0e14;
-    --bg-panel: #0c1118;
-    --bg-hover: #11161e;
+    --bg: #000000;
+    --bg-elevated: #0d0d0d;
+    --bg-panel: #111111;
+    --bg-hover: #161616;
     --fg: #e8edf2;
     --fg-muted: #8a95a3;
-    --fg-dim: #4a5462;
-    --brand-accent: #0690fc;
-    --brand-accent-hover: #1a9eff;
-    --brand-accent-glow: rgba(6, 144, 252, 0.15);
+    --fg-dim: #484f59;
+    --brand-accent: #fafafa;
+    --brand-accent-hover: #e4e4e7;
+    --brand-accent-glow: rgba(250, 250, 250, 0.08);
     --success: #4ade80;
     --warning: #fbbf24;
     --danger: #f87171;
-    --border: rgba(255, 255, 255, 0.06);
+    --border: rgba(255, 255, 255, 0.07);
     --border-strong: rgba(255, 255, 255, 0.12);
-    --border-accent: rgba(6, 144, 252, 0.4);
+    --border-accent: rgba(250, 250, 250, 0.18);
 
     /* shadcn tokens */
-    --background: #05070a;
+    --background: #000000;
     --foreground: #e8edf2;
-    --card: #0c1118;
+    --card: #0f0f0f;
     --card-foreground: #e8edf2;
-    --popover: #0a0e14;
+    --popover: #0d0d0d;
     --popover-foreground: #e8edf2;
-    --primary: #0690fc;
-    --primary-foreground: #ffffff;
-    --secondary: #0c1118;
+    --primary: #fafafa;
+    --primary-foreground: #09090b;
+    --secondary: #111111;
     --secondary-foreground: #e8edf2;
-    --muted: #0a0e14;
+    --muted: #0d0d0d;
     --muted-foreground: #8a95a3;
-    --accent: #11161e;
+    --accent: #161616;
     --accent-foreground: #e8edf2;
     --destructive: #f87171;
     --input: rgba(255, 255, 255, 0.08);
-    --ring: rgba(6, 144, 252, 0.4);
+    --ring: rgba(250, 250, 250, 0.25);
 
-    --chart-1: #0690fc;
+    --chart-1: #fafafa;
     --chart-2: #4ade80;
     --chart-3: #fbbf24;
     --chart-4: #f87171;
     --chart-5: #8a95a3;
 
-    --sidebar: #0a0e14;
+    --sidebar: #000000;
     --sidebar-foreground: #e8edf2;
-    --sidebar-primary: #0690fc;
-    --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #11161e;
+    --sidebar-primary: #fafafa;
+    --sidebar-primary-foreground: #09090b;
+    --sidebar-accent: #1a1a1a;
     --sidebar-accent-foreground: #e8edf2;
-    --sidebar-border: rgba(255, 255, 255, 0.06);
-    --sidebar-ring: rgba(6, 144, 252, 0.4);
+    --sidebar-border: rgba(255, 255, 255, 0.07);
+    --sidebar-ring: rgba(250, 250, 250, 0.25);
   }
 }
 
@@ -181,6 +181,9 @@
   }
   html {
     @apply font-sans;
+  }
+  button, [role="button"], [type="button"], [type="submit"], [type="reset"] {
+    cursor: pointer;
   }
 }
 
@@ -250,5 +253,16 @@
 /* Scrollbar styling */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.2); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.35); }
+::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.18); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.32); }
+
+/* Sidebar active item: filled brand background */
+[data-sidebar="menu-button"][data-active="true"] {
+  background: var(--brand-accent) !important;
+}
+[data-sidebar="menu-button"][data-active="true"] svg {
+  color: var(--primary-foreground) !important;
+}
+[data-sidebar="menu-button"][data-active="true"] span {
+  color: var(--primary-foreground) !important;
+}

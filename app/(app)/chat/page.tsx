@@ -3,8 +3,13 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { format } from 'date-fns'
-import { Send, Bot, User, RotateCcw, Sparkles } from 'lucide-react'
-import { LiveIndicator } from '@/components/live-indicator'
+import { Send, RotateCcw, Sparkles, Bot, User } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 import { generateAIResponse, type ChatMessage } from '@/lib/ai-responses'
 import { getDashboardMetrics, generateStores, generateFlaggedIncidents } from '@/lib/mock-data'
 
@@ -35,7 +40,6 @@ const INITIAL_MESSAGE: ChatMessage = {
   timestamp: new Date(),
 }
 
-// Render markdown-lite: bold, line breaks
 function renderContent(text: string) {
   const lines = text.split('\n')
   return lines.map((line, i) => {
@@ -44,10 +48,10 @@ function renderContent(text: string) {
       <span key={i}>
         {parts.map((part, j) => {
           if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={j} style={{ color: 'var(--fg)', fontWeight: 600 }}>{part.slice(2, -2)}</strong>
+            return <strong key={j} className="font-semibold text-foreground">{part.slice(2, -2)}</strong>
           }
           if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
-            return <em key={j} style={{ color: 'var(--fg-muted)' }}>{part.slice(1, -1)}</em>
+            return <em key={j} className="text-muted-foreground">{part.slice(1, -1)}</em>
           }
           return <span key={j}>{part}</span>
         })}
@@ -59,11 +63,11 @@ function renderContent(text: string) {
 
 function TypingIndicator() {
   return (
-    <div className="flex items-center gap-1.5 px-1">
+    <div className="flex items-center gap-1 px-1 py-0.5">
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}
-          style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--brand-accent)', display: 'inline-block' }}
+          className="size-1.5 rounded-full bg-muted-foreground/50 inline-block"
           animate={{ opacity: [0.3, 1, 0.3] }}
           transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
         />
@@ -76,38 +80,28 @@ function MessageBubble({ msg }: { msg: ChatMessage }) {
   const isUser = msg.role === 'user'
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.18 }}
       className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
     >
-      {/* Avatar */}
-      <div
-        className="flex items-center justify-center rounded-full shrink-0 mt-0.5"
-        style={{
-          width: 28,
-          height: 28,
-          background: isUser ? 'var(--bg-panel)' : 'rgba(6,144,252,0.15)',
-          border: `1px solid ${isUser ? 'var(--border-strong)' : 'var(--border-accent)'}`,
-          color: isUser ? 'var(--fg)' : 'var(--brand-accent)',
-        }}
-      >
-        {isUser ? <User size={13} /> : <Bot size={13} />}
-      </div>
+      <Avatar size="sm" className="mt-0.5 shrink-0">
+        <AvatarFallback className={isUser ? 'bg-muted' : 'bg-primary/10 text-primary'}>
+          {isUser ? <User className="size-3" /> : <Bot className="size-3" />}
+        </AvatarFallback>
+      </Avatar>
 
-      {/* Content */}
-      <div className={`flex flex-col gap-1 max-w-[80%] ${isUser ? 'items-end' : 'items-start'}`}>
+      <div className={`flex flex-col gap-1 max-w-[78%] ${isUser ? 'items-end' : 'items-start'}`}>
         <div
-          className="px-4 py-3 text-sm leading-relaxed"
-          style={{
-            background: isUser ? 'var(--bg-elevated)' : 'var(--bg-panel)',
-            border: `1px solid ${isUser ? 'var(--border-strong)' : 'var(--border-accent)'}`,
-            color: 'var(--fg-muted)',
-          }}
+          className={`rounded-lg px-3.5 py-2.5 text-sm leading-relaxed ${
+            isUser
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-muted text-muted-foreground'
+          }`}
         >
           {renderContent(msg.content)}
         </div>
-        <span className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>
+        <span className="text-xs text-muted-foreground/60 tabular-nums">
           {format(msg.timestamp, 'HH:mm:ss')}
         </span>
       </div>
@@ -145,7 +139,6 @@ export default function ChatPage() {
     setInput('')
     setIsTyping(true)
 
-    // Simulate response latency (600–1400ms)
     const delay = 600 + Math.random() * 800
     await new Promise((r) => setTimeout(r, delay))
 
@@ -177,109 +170,72 @@ export default function ChatPage() {
     setMessages([INITIAL_MESSAGE])
   }
 
+  const openIncidents = incidents.filter(i => i.status === 'open').length
+
   return (
-    <div className="flex flex-col" style={{ height: 'calc(100vh - 56px - 48px)' }}>
+    <div className="flex flex-col" style={{ height: 'calc(100vh - 52px - 48px)' }}>
       {/* Header */}
       <div className="flex items-center justify-between pb-4 shrink-0">
         <div>
-          <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>
-            Ask AI
-          </h1>
-          <div className="flex items-center gap-2 mt-1">
-            <LiveIndicator />
-            <span className="text-sm" style={{ color: 'var(--fg-muted)' }}>
-              I know about your {stores.length} stores and the {metrics.eventsProcessed.toLocaleString()} things that happened today.
-            </span>
-          </div>
+          <h1 className="text-[18px] font-semibold tracking-tight">Ask AI</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            {stores.length} stores · {metrics.eventsProcessed.toLocaleString()} events today
+          </p>
         </div>
-        <button
-          onClick={clearChat}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-colors"
-          style={{ border: '1px solid var(--border-strong)', color: 'var(--fg-muted)' }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--fg)' }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--fg-muted)' }}
-        >
-          <RotateCcw size={13} /> Clear chat
-        </button>
+        <Button variant="outline" size="sm" onClick={clearChat} className="gap-1.5">
+          <RotateCcw className="size-3.5" />
+          Clear
+        </Button>
       </div>
 
-      <div
-        className="flex flex-1 gap-4 overflow-hidden"
-        style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
-      >
+      {/* Main container */}
+      <div className="flex flex-1 overflow-hidden rounded-lg border border-border bg-card">
         {/* Chat area */}
         <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-5">
-            <AnimatePresence initial={false}>
-              {messages.map((msg) => (
-                <MessageBubble key={msg.id} msg={msg} />
-              ))}
-            </AnimatePresence>
+          <ScrollArea className="flex-1 px-5 py-5">
+            <div className="flex flex-col gap-5">
+              <AnimatePresence initial={false}>
+                {messages.map((msg) => (
+                  <MessageBubble key={msg.id} msg={msg} />
+                ))}
+              </AnimatePresence>
 
-            {/* Typing indicator */}
-            <AnimatePresence>
-              {isTyping && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className="flex gap-3"
-                >
-                  <div
-                    className="flex items-center justify-center rounded-full shrink-0"
-                    style={{
-                      width: 28,
-                      height: 28,
-                      background: 'rgba(6,144,252,0.15)',
-                      border: '1px solid var(--border-accent)',
-                      color: 'var(--brand-accent)',
-                    }}
+              <AnimatePresence>
+                {isTyping && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="flex gap-3"
                   >
-                    <Bot size={13} />
-                  </div>
-                  <div
-                    className="px-4 py-3 flex items-center"
-                    style={{
-                      background: 'var(--bg-panel)',
-                      border: '1px solid var(--border-accent)',
-                    }}
-                  >
-                    <TypingIndicator />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    <Avatar size="sm" className="mt-0.5 shrink-0">
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        <Bot className="size-3" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="rounded-lg px-3.5 py-2.5 bg-muted flex items-center">
+                      <TypingIndicator />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
-            <div ref={messagesEndRef} />
-          </div>
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
+
+          <Separator />
 
           {/* Input area */}
-          <div
-            className="shrink-0 px-4 py-4"
-            style={{ borderTop: '1px solid var(--border)' }}
-          >
-            {/* Suggested prompts (only show if no user message yet) */}
+          <div className="shrink-0 px-4 py-3">
             {messages.length === 1 && (
-              <div className="flex flex-wrap gap-2 mb-3">
+              <div className="flex flex-wrap gap-1.5 mb-3">
                 {SUGGESTED_PROMPTS.slice(0, 4).map((prompt) => (
                   <button
                     key={prompt}
                     onClick={() => sendMessage(prompt)}
-                    className="px-3 py-1.5 text-xs transition-colors"
-                    style={{
-                      border: '1px solid var(--border-strong)',
-                      color: 'var(--fg-muted)',
-                      background: 'var(--bg-elevated)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--border-accent)'
-                      e.currentTarget.style.color = 'var(--brand-accent)'
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.borderColor = 'var(--border-strong)'
-                      e.currentTarget.style.color = 'var(--fg-muted)'
-                    }}
+                    className="px-2.5 py-1 text-xs rounded-md border border-border bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground hover:border-border transition-colors"
                   >
                     {prompt}
                   </button>
@@ -288,115 +244,101 @@ export default function ChatPage() {
             )}
 
             <form onSubmit={handleSubmit} className="flex gap-2">
-              <input
+              <Input
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask about stores, inventory, loss prevention, payments..."
+                placeholder="Ask about stores, inventory, loss prevention, payments…"
                 disabled={isTyping}
-                className="flex-1 px-4 py-2.5 text-sm outline-none transition-colors"
-                style={{
-                  background: 'var(--bg-elevated)',
-                  border: '1px solid var(--border-strong)',
-                  color: 'var(--fg)',
-                  opacity: isTyping ? 0.6 : 1,
-                }}
-                onFocus={(e) => { e.target.style.borderColor = 'var(--border-accent)' }}
-                onBlur={(e) => { e.target.style.borderColor = 'var(--border-strong)' }}
+                className="h-9 flex-1"
               />
-              <button
+              <Button
                 type="submit"
+                size="sm"
                 disabled={!input.trim() || isTyping}
-                className="px-4 py-2.5 flex items-center gap-2 data-mono text-xs transition-colors"
-                style={{
-                  background: input.trim() && !isTyping ? 'var(--brand-accent)' : 'var(--bg-elevated)',
-                  color: input.trim() && !isTyping ? '#fff' : 'var(--fg-dim)',
-                  border: `1px solid ${input.trim() && !isTyping ? 'var(--brand-accent)' : 'var(--border-strong)'}`,
-                }}
+                className="h-9 gap-1.5 px-3"
               >
-                <Send size={13} />
-                <span className="hidden sm:inline">SEND</span>
-              </button>
+                <Send className="size-3.5" />
+                <span className="hidden sm:inline">Send</span>
+              </Button>
             </form>
           </div>
         </div>
 
-        {/* Right panel — context summary */}
-        <div
-          className="hidden lg:flex flex-col shrink-0 overflow-y-auto"
-          style={{ width: 240, borderLeft: '1px solid var(--border)' }}
-        >
-          <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-            <div className="flex items-center gap-2">
-              <Sparkles size={12} style={{ color: 'var(--brand-accent)' }} />
-              <p className="text-sm font-medium" style={{ color: 'var(--fg)' }}>What I&apos;m looking at</p>
+        {/* Right sidebar */}
+        <div className="hidden lg:flex flex-col shrink-0 w-56 border-l border-border overflow-hidden">
+          <div className="px-4 py-3 flex items-center gap-2">
+            <Sparkles className="size-3.5 text-muted-foreground" />
+            <span className="text-sm font-medium">Context</span>
+          </div>
+          <Separator />
+
+          <ScrollArea className="flex-1">
+            {/* System stats */}
+            <div className="px-4 py-3">
+              <p className="text-xs font-medium text-muted-foreground mb-2">System status</p>
+              <div className="space-y-1">
+                {[
+                  { label: 'Events today', value: metrics.eventsProcessed.toLocaleString() },
+                  { label: 'Open incidents', value: String(openIncidents) },
+                  { label: 'Cameras online', value: `${metrics.activeCameras}/${metrics.totalCameras}` },
+                  { label: 'Payment rate', value: `${metrics.paymentSuccessRate}%` },
+                  { label: 'Shrink prevented', value: `$${metrics.shrinkPrevented.toLocaleString()}` },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex items-center justify-between py-1.5 border-b border-border last:border-0">
+                    <span className="text-xs text-muted-foreground">{label}</span>
+                    <span className="text-xs font-medium tabular-nums">{value}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="flex flex-col gap-0 px-4 py-3">
-            <p className="text-xs mb-2" style={{ color: 'var(--fg-muted)' }}>System status</p>
-            {[
-              { label: 'Events today', value: metrics.eventsProcessed.toLocaleString() },
-              { label: 'Open incidents', value: String(incidents.filter(i => i.status === 'open').length) },
-              { label: 'Cameras online', value: `${metrics.activeCameras}/${metrics.totalCameras}` },
-              { label: 'Payment rate', value: `${metrics.paymentSuccessRate}%` },
-              { label: 'Shrink prevented', value: `$${metrics.shrinkPrevented.toLocaleString()}` },
-            ].map(({ label, value }) => (
-              <div key={label} className="flex justify-between py-2" style={{ borderBottom: '1px solid var(--border)' }}>
-                <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>{label}</span>
-                <span className="data-mono text-xs" style={{ color: 'var(--fg)' }}>{value}</span>
+            <Separator />
+
+            {/* Stores */}
+            <div className="px-4 py-3">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Stores</p>
+              <div className="space-y-1">
+                {stores.slice(0, 6).map((store) => (
+                  <div key={store.id} className="flex items-center gap-2 py-1.5 border-b border-border last:border-0">
+                    <span className={`size-1.5 rounded-full shrink-0 ${
+                      store.status === 'online' ? 'bg-green-500' :
+                      store.status === 'degraded' ? 'bg-yellow-500' : 'bg-red-500'
+                    }`} />
+                    <span className="text-xs text-muted-foreground flex-1 font-mono truncate">{store.id}</span>
+                    <Badge
+                      variant={store.shrinkDelta > 0 ? 'destructive' : 'secondary'}
+                      className="text-[10px] h-4 px-1.5 font-mono"
+                    >
+                      {store.shrinkDelta > 0 ? '+' : ''}{store.shrinkDelta}%
+                    </Badge>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
 
-          <div className="flex flex-col gap-0 px-4 py-3" style={{ borderTop: '1px solid var(--border)' }}>
-            <p className="text-xs mb-2" style={{ color: 'var(--fg-muted)' }}>Stores</p>
-            {stores.slice(0, 6).map((store) => (
-              <div key={store.id} className="flex items-center gap-2 py-2" style={{ borderBottom: '1px solid var(--border)' }}>
-                <span style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: '50%',
-                  flexShrink: 0,
-                  background: store.status === 'online' ? 'var(--success)' : store.status === 'degraded' ? 'var(--warning)' : 'var(--danger)',
-                }} />
-                <span className="data-mono text-xs flex-1 truncate" style={{ color: 'var(--fg-muted)' }}>{store.id}</span>
-                <span className="data-mono text-xs" style={{ color: store.shrinkDelta > 0 ? 'var(--danger)' : 'var(--success)' }}>
-                  {store.shrinkDelta > 0 ? '+' : ''}{store.shrinkDelta}%
-                </span>
+            <Separator />
+
+            {/* Suggested prompts */}
+            <div className="px-4 py-3">
+              <p className="text-xs font-medium text-muted-foreground mb-2">Try asking</p>
+              <div className="flex flex-col gap-1">
+                {SUGGESTED_PROMPTS.slice(4).map((prompt) => (
+                  <button
+                    key={prompt}
+                    onClick={() => {
+                      setInput(prompt)
+                      inputRef.current?.focus()
+                    }}
+                    className="text-left text-xs px-2.5 py-2 rounded-md border border-border bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  >
+                    {prompt}
+                  </button>
+                ))}
               </div>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-2 px-4 py-3" style={{ borderTop: '1px solid var(--border)' }}>
-            <p className="text-xs mb-1" style={{ color: 'var(--fg-muted)' }}>Try asking</p>
-            {SUGGESTED_PROMPTS.slice(4).map((prompt) => (
-              <button
-                key={prompt}
-                onClick={() => {
-                  setInput(prompt)
-                  inputRef.current?.focus()
-                }}
-                className="text-left text-xs px-2 py-2 transition-colors"
-                style={{
-                  background: 'var(--bg-elevated)',
-                  border: '1px solid var(--border)',
-                  color: 'var(--fg-muted)',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border-accent)'
-                  e.currentTarget.style.color = 'var(--brand-accent)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--border)'
-                  e.currentTarget.style.color = 'var(--fg-muted)'
-                }}
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
+            </div>
+          </ScrollArea>
         </div>
       </div>
     </div>

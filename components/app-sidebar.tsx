@@ -1,7 +1,8 @@
 'use client'
 
+import * as React from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard,
   Radio,
@@ -12,21 +13,26 @@ import {
   MessageSquare,
   Store,
   Settings,
-  Camera,
-  Users,
-  BookOpen,
-  MoreHorizontal,
-  ChevronLeft,
-  ChevronRight,
   Bot,
+  LogOut,
+  User,
+  ChevronDown,
 } from 'lucide-react'
 import { StoreSelector } from './store-selector'
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+} from '@/components/ui/sidebar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +40,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useRouter } from 'next/navigation'
 
 interface NavItem {
   href: string
@@ -71,48 +76,34 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: 'Setup',
     items: [
-      { href: '/settings?tab=rules', icon: BookOpen, label: 'Alerts & rules' },
-      { href: '/settings?tab=cameras', icon: Camera, label: 'Cameras' },
-      { href: '/settings?tab=team', icon: Users, label: 'Team' },
       { href: '/settings', icon: Settings, label: 'Settings' },
     ],
   },
 ]
 
-function AlwonLogo({ collapsed }: { collapsed: boolean }) {
+function AlwonMark() {
   return (
-    <div className="flex items-center gap-2.5 overflow-hidden">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-        <polygon
-          points="12,2 22,20 2,20"
-          stroke="var(--brand-accent)"
-          strokeWidth="1.5"
-          fill="none"
-          strokeLinejoin="round"
-        />
-        <line x1="12" y1="8" x2="12" y2="15" stroke="var(--brand-accent)" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="12" cy="17.5" r="0.75" fill="var(--brand-accent)" />
-      </svg>
-      {!collapsed && (
-        <span
-          className="font-semibold text-base whitespace-nowrap overflow-hidden"
-          style={{ color: 'var(--fg)' }}
-        >
-          Alwon
-        </span>
-      )}
-    </div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <polygon
+        points="12,2 22,20 2,20"
+        stroke="var(--brand-accent)"
+        strokeWidth="1.8"
+        fill="none"
+        strokeLinejoin="round"
+      />
+      <line
+        x1="12" y1="8" x2="12" y2="15"
+        stroke="var(--brand-accent)"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <circle cx="12" cy="17.5" r="0.9" fill="var(--brand-accent)" />
+    </svg>
   )
 }
 
-interface AppSidebarProps {
-  collapsed: boolean
-  onToggle: () => void
-}
-
-export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
+function NavMain() {
   const pathname = usePathname()
-  const router = useRouter()
 
   const isActive = (href: string) => {
     const base = href.split('?')[0]
@@ -121,218 +112,144 @@ export function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   }
 
   return (
-    <TooltipProvider delayDuration={200}>
-      <nav
-        className="hidden md:flex flex-col h-full overflow-hidden transition-all duration-200 ease-in-out"
-        style={{
-          width: collapsed ? 56 : 240,
-          minWidth: collapsed ? 56 : 240,
-          background: 'var(--bg-elevated)',
-          borderRight: '1px solid var(--border)',
-        }}
-      >
-        {/* Logo + store selector */}
-        <div
-          className="flex flex-col gap-3 py-4 overflow-hidden"
-          style={{
-            borderBottom: '1px solid var(--border)',
-            padding: collapsed ? '1rem 0' : '1rem',
-            alignItems: collapsed ? 'center' : undefined,
-          }}
-        >
-          <AlwonLogo collapsed={collapsed} />
-          {!collapsed && (
-            <div className="flex items-center gap-2">
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--success)', flexShrink: 0 }} />
-              <StoreSelector />
-            </div>
-          )}
-        </div>
-
-        {/* Nav groups */}
-        <div className="flex-1 overflow-y-auto py-3" style={{ padding: collapsed ? '0.75rem 0' : '0.75rem 0.5rem' }}>
-          {NAV_GROUPS.map((group) => (
-            <div key={group.label} className="mb-5">
-              {!collapsed && (
-                <div
-                  className="px-2 mb-1.5 text-xs"
-                  style={{ color: 'var(--fg-muted)', fontWeight: 500, paddingTop: '0.125rem', paddingBottom: '0.125rem' }}
-                >
-                  {group.label}
-                </div>
-              )}
-              {collapsed && <div style={{ height: 4 }} />}
-
+    <>
+      {NAV_GROUPS.map((group) => (
+        <SidebarGroup key={group.label} className="py-1">
+          <SidebarGroupLabel className="h-6 px-3 text-[10px] font-semibold uppercase tracking-widest text-sidebar-foreground/40 mb-0.5">
+            {group.label}
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
               {group.items.map((item) => {
                 const active = isActive(item.href)
                 const Icon = item.icon
-
-                const linkContent = (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="flex items-center gap-2.5 transition-colors duration-150"
-                    style={{
-                      borderLeft: !collapsed && active ? '2px solid var(--brand-accent)' : !collapsed ? '2px solid transparent' : undefined,
-                      borderRadius: collapsed ? 'var(--radius-sm)' : '0 var(--radius-sm) var(--radius-sm) 0',
-                      background: active ? 'var(--bg-hover)' : 'transparent',
-                      color: active ? 'var(--fg)' : 'var(--fg-muted)',
-                      padding: collapsed ? '0.5rem' : '0.5rem 0.5rem',
-                      justifyContent: collapsed ? 'center' : undefined,
-                      position: 'relative',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!active) {
-                        e.currentTarget.style.background = 'var(--bg-hover)'
-                        e.currentTarget.style.color = 'var(--fg)'
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!active) {
-                        e.currentTarget.style.background = 'transparent'
-                        e.currentTarget.style.color = 'var(--fg-muted)'
-                      }
-                    }}
-                  >
-                    {/* Active indicator for collapsed mode */}
-                    {collapsed && active && (
-                      <span
-                        className="absolute left-0 top-1/2 -translate-y-1/2"
-                        style={{ width: 2, height: '60%', background: 'var(--brand-accent)' }}
-                      />
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={active}
+                      tooltip={item.label}
+                      className="h-8 rounded-md text-sm gap-2.5 px-3 font-normal text-sidebar-foreground/70 hover:text-sidebar-foreground"
+                    >
+                      <Link href={item.href}>
+                        <Icon size={15} />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                    {item.badge !== undefined && (
+                      <SidebarMenuBadge
+                        className="text-[10px] h-4 min-w-[16px] px-1 rounded-full font-semibold !top-1/2 !-translate-y-1/2"
+                        style={{
+                          background: item.badge > 0 ? 'var(--danger)' : 'var(--border-strong)',
+                          color: item.badge > 0 ? '#fff' : 'var(--fg-muted)',
+                        }}
+                      >
+                        {item.badge}
+                      </SidebarMenuBadge>
                     )}
-                    <Icon size={16} strokeWidth={1.5} style={{ flexShrink: 0 }} />
-                    {!collapsed && (
-                      <>
-                        <span className="text-sm flex-1 whitespace-nowrap overflow-hidden">{item.label}</span>
-                        {item.badge !== undefined && (
-                          <span
-                            className="data-mono text-xs px-1.5 py-0.5"
-                            style={{
-                              background: 'var(--bg-panel)',
-                              color: 'var(--fg-dim)',
-                              border: '1px solid var(--border)',
-                            }}
-                          >
-                            {item.badge}
-                          </span>
-                        )}
-                      </>
-                    )}
-                    {/* Badge dot in collapsed mode */}
-                    {collapsed && item.badge !== undefined && (
-                      <span
-                        className="absolute top-1 right-1"
-                        style={{ width: 5, height: 5, borderRadius: '50%', background: 'var(--brand-accent)' }}
-                      />
-                    )}
-                  </Link>
+                  </SidebarMenuItem>
                 )
-
-                return collapsed ? (
-                  <Tooltip key={item.href}>
-                    <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
-                    <TooltipContent side="right" className="data-mono text-xs">
-                      {item.label}
-                      {item.badge !== undefined && (
-                        <span className="ml-1.5" style={{ color: 'var(--brand-accent)' }}>{item.badge}</span>
-                      )}
-                    </TooltipContent>
-                  </Tooltip>
-                ) : linkContent
               })}
-            </div>
-          ))}
-        </div>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      ))}
+    </>
+  )
+}
 
-        {/* User pill */}
-        <div
-          className="flex items-center overflow-hidden"
-          style={{
-            borderTop: '1px solid var(--border)',
-            padding: collapsed ? '0.75rem 0' : '0.75rem 1rem',
-            gap: collapsed ? 0 : '0.625rem',
-            justifyContent: collapsed ? 'center' : undefined,
-          }}
-        >
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className={`flex items-center gap-2.5 outline-none ${collapsed ? 'justify-center' : 'w-full'}`}>
-                <div
-                  className="flex items-center justify-center rounded-full text-xs font-medium shrink-0"
-                  style={{ width: 28, height: 28, background: 'var(--bg-panel)', color: 'var(--fg)', border: '1px solid var(--border-strong)' }}
-                >
-                  E
-                </div>
-                {!collapsed && (
-                  <>
-                    <div className="flex-1 min-w-0 text-left">
-                      <p className="text-sm truncate" style={{ color: 'var(--fg)', fontWeight: 500 }}>Elena Martinez</p>
-                      <p className="text-xs truncate" style={{ color: 'var(--fg-muted)' }}>Store Manager</p>
-                    </div>
-                    <MoreHorizontal size={14} style={{ color: 'var(--fg-muted)', flexShrink: 0 }} />
-                  </>
-                )}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              side={collapsed ? 'right' : 'top'}
-              align="end"
-              className="w-48"
-              style={{
-                background: 'var(--bg-elevated)',
-                border: '1px solid var(--border-strong)',
-                borderRadius: '2px',
-              }}
+function NavUser() {
+  const router = useRouter()
+
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton
+              size="lg"
+              tooltip="Santiago Garces"
+              className="h-10 gap-3 px-3 hover:bg-sidebar-accent rounded-md"
             >
-              <DropdownMenuItem
-                onClick={() => router.push('/settings')}
-                className="data-mono text-xs gap-2 cursor-pointer"
-                style={{ color: 'var(--fg-muted)' }}
+              <div
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-semibold"
+                style={{
+                  background: 'var(--brand-accent-glow)',
+                  color: 'var(--brand-accent)',
+                  border: '1px solid var(--border-accent)',
+                }}
               >
-                <Users size={13} /> Profile
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => router.push('/settings')}
-                className="data-mono text-xs gap-2 cursor-pointer"
-                style={{ color: 'var(--fg-muted)' }}
-              >
-                <Settings size={13} /> Settings
-              </DropdownMenuItem>
-              <DropdownMenuSeparator style={{ background: 'var(--border)' }} />
-              <DropdownMenuItem
-                onClick={() => router.push('/login')}
-                className="data-mono text-xs gap-2 cursor-pointer"
-                style={{ color: 'var(--danger)' }}
-              >
-                Sign out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                S
+              </div>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate text-sm font-medium text-sidebar-foreground">Santiago Garces</span>
+                <span className="truncate text-[11px] text-sidebar-foreground/50">Store Manager</span>
+              </div>
+              <ChevronDown className="ml-auto size-3.5 text-sidebar-foreground/40 shrink-0" />
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="end" className="w-52 rounded-lg">
+            <DropdownMenuItem onClick={() => router.push('/settings')} className="gap-2 cursor-pointer text-sm">
+              <User className="size-3.5" />
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/settings')} className="gap-2 cursor-pointer text-sm">
+              <Settings className="size-3.5" />
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => router.push('/login')}
+              className="gap-2 cursor-pointer text-sm text-destructive focus:text-destructive"
+            >
+              <LogOut className="size-3.5" />
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  )
+}
+
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  return (
+    <Sidebar collapsible="icon" {...props}>
+      {/* Header: logo row + store selector row */}
+      <SidebarHeader className="border-b border-sidebar-border gap-0 p-0">
+        {/* Logo row — h-[52px] matches topbar height so borders align when collapsed */}
+        <div className="flex h-[52px] items-center gap-2.5 px-3">
+          <div
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md"
+            style={{ background: 'var(--brand-accent-glow)', border: '1px solid var(--border-accent)' }}
+          >
+            <AlwonMark />
+          </div>
+          <span className="truncate font-semibold text-[13px] text-sidebar-foreground group-data-[collapsible=icon]:hidden">
+            Alwon
+          </span>
         </div>
 
-        {/* Collapse toggle */}
-        <button
-          onClick={onToggle}
-          className="flex items-center justify-center py-2 transition-colors"
-          style={{
-            borderTop: '1px solid var(--border)',
-            color: 'var(--fg-dim)',
-            background: 'transparent',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'var(--bg-hover)'
-            e.currentTarget.style.color = 'var(--fg)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'transparent'
-            e.currentTarget.style.color = 'var(--fg-dim)'
-          }}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-        </button>
-      </nav>
-    </TooltipProvider>
+        {/* Store selector row — hidden when collapsed to icon */}
+        <div className="group-data-[collapsible=icon]:hidden flex items-center gap-1.5 px-3 pb-3">
+          <span
+            className="h-1.5 w-1.5 shrink-0 rounded-full"
+            style={{ background: 'var(--success)' }}
+            aria-hidden="true"
+          />
+          <StoreSelector />
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent className="py-2">
+        <NavMain />
+      </SidebarContent>
+
+      <SidebarFooter className="border-t border-sidebar-border py-2">
+        <NavUser />
+      </SidebarFooter>
+
+      <SidebarRail />
+    </Sidebar>
   )
 }

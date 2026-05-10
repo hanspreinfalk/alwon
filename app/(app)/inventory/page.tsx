@@ -4,6 +4,10 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { Grid, List, AlertTriangle } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { SectionHeader } from '@/components/section-header'
 import { generateSKUs } from '@/lib/mock-data'
 import type { SKU } from '@/lib/types'
@@ -12,27 +16,28 @@ const SKUS = generateSKUs()
 const SHELVES = Array.from(new Set(SKUS.map((s) => s.shelf))).sort()
 
 const RISK_COLORS: Record<string, string> = {
-  low: 'var(--success)',
-  medium: 'var(--warning)',
-  high: 'var(--danger)',
-  critical: 'var(--danger)',
+  low: 'text-green-600 dark:text-green-400',
+  medium: 'text-amber-600 dark:text-amber-400',
+  high: 'text-red-600 dark:text-red-400',
+  critical: 'text-red-600 dark:text-red-400',
+}
+
+const RISK_DOT: Record<string, string> = {
+  low: 'bg-green-500',
+  medium: 'bg-amber-500',
+  high: 'bg-red-500',
+  critical: 'bg-red-500',
 }
 
 function StockBar({ current, max }: { current: number; max: number }) {
   const pct = max > 0 ? current / max : 0
-  const color = pct < 0.1 ? 'var(--danger)' : pct < 0.3 ? 'var(--warning)' : 'var(--success)'
+  const color = pct < 0.1 ? 'bg-red-500' : pct < 0.3 ? 'bg-amber-500' : 'bg-green-500'
   return (
     <div className="flex items-center gap-2">
-      <div
-        className="flex-1 rounded-full overflow-hidden"
-        style={{ height: 4, background: 'var(--bg-elevated)' }}
-      >
-        <div
-          className="h-full transition-all rounded-full"
-          style={{ width: `${pct * 100}%`, background: color }}
-        />
+      <div className="flex-1 rounded-full overflow-hidden bg-muted" style={{ height: 4 }}>
+        <div className={`h-full transition-all rounded-full ${color}`} style={{ width: `${pct * 100}%` }} />
       </div>
-      <span className="data-mono text-xs shrink-0" style={{ color: 'var(--fg-dim)', minWidth: 40 }}>
+      <span className="font-mono text-xs shrink-0 text-muted-foreground tabular-nums" style={{ minWidth: 40 }}>
         {current}/{max}
       </span>
     </div>
@@ -43,53 +48,32 @@ function ShelfCard({ shelf, skus }: { shelf: string; skus: SKU[] }) {
   const total = skus.reduce((s, sk) => s + sk.currentStock, 0)
   const maxTotal = skus.reduce((s, sk) => s + sk.maxStock, 0)
   const pct = maxTotal > 0 ? total / maxTotal : 0
-  const color = pct < 0.1 ? 'var(--danger)' : pct < 0.3 ? 'var(--warning)' : 'var(--success)'
-  const [hovered, setHovered] = useState(false)
+  const color = pct < 0.1 ? 'bg-red-500' : pct < 0.3 ? 'bg-amber-500' : 'bg-green-500'
 
   return (
-    <div
-      className="relative flex flex-col p-3 transition-colors cursor-pointer"
-      style={{
-        border: '1px solid var(--border)',
-        background: hovered ? 'var(--bg-hover)' : 'var(--bg-panel)',
-        minHeight: 80,
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <p className="text-sm font-medium mb-2" style={{ color: 'var(--fg)' }}>{shelf}</p>
+    <div className="relative flex flex-col p-3 rounded-lg border bg-card hover:bg-muted/40 transition-colors cursor-pointer group">
+      <p className="text-sm font-medium mb-2">{shelf}</p>
       <div className="flex items-center gap-2 mb-2">
-        <div
-          className="flex-1 rounded-full overflow-hidden"
-          style={{ height: 6, background: 'var(--bg-elevated)' }}
-        >
-          <div
-            className="h-full rounded-full transition-all"
-            style={{ width: `${pct * 100}%`, background: color }}
-          />
+        <div className="flex-1 rounded-full overflow-hidden bg-muted" style={{ height: 6 }}>
+          <div className={`h-full rounded-full transition-all ${color}`} style={{ width: `${pct * 100}%` }} />
         </div>
-        <span className="text-xs shrink-0" style={{ color: 'var(--fg-muted)' }}>
+        <span className="text-xs shrink-0 text-muted-foreground">
           {total}/{maxTotal}
         </span>
       </div>
-      <p className="text-xs" style={{ color: 'var(--fg-muted)' }}>{skus.length} {skus.length === 1 ? 'product' : 'products'}</p>
+      <p className="text-xs text-muted-foreground">{skus.length} {skus.length === 1 ? 'product' : 'products'}</p>
 
-      {hovered && (
-        <div
-          className="absolute left-0 right-0 bottom-full z-10 p-3 mb-1"
-          style={{ borderRadius: 'var(--radius)', background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)' }}
-        >
-          <p className="text-xs mb-2" style={{ color: 'var(--fg-muted)' }}>Items on this shelf</p>
-          {skus.slice(0, 4).map((sku) => (
-            <div key={sku.id} className="flex justify-between text-xs py-0.5" style={{ color: 'var(--fg-muted)' }}>
-              <span className="data-mono truncate flex-1">{sku.id}</span>
-              <span className="data-mono ml-2" style={{ color: sku.currentStock < 2 ? 'var(--danger)' : 'var(--fg-dim)' }}>
-                {sku.currentStock}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="absolute left-0 right-0 bottom-full z-10 p-3 mb-1 rounded-lg border bg-popover shadow-md hidden group-hover:block">
+        <p className="text-xs text-muted-foreground mb-2">Items on this shelf</p>
+        {skus.slice(0, 4).map((sku) => (
+          <div key={sku.id} className="flex justify-between text-xs py-0.5">
+            <span className="font-mono truncate flex-1 text-muted-foreground">{sku.id}</span>
+            <span className={`font-mono ml-2 ${sku.currentStock < 2 ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'}`}>
+              {sku.currentStock}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
@@ -143,8 +127,8 @@ function TableView({ skus, search }: { skus: SKU[]; search: string }) {
 
   const SortHeader = ({ col, label, width }: { col: keyof SKU; label: string; width?: string }) => (
     <th
-      className="px-4 py-2.5 text-left cursor-pointer select-none text-xs"
-      style={{ width, color: 'var(--fg-muted)', fontWeight: 500 }}
+      className="px-4 py-2.5 text-left cursor-pointer select-none text-xs text-muted-foreground font-medium"
+      style={{ width }}
       onClick={() => handleSort(col)}
     >
       {label} {sortBy === col ? (sortDir === 'desc' ? '↓' : '↑') : ''}
@@ -152,16 +136,16 @@ function TableView({ skus, search }: { skus: SKU[]; search: string }) {
   )
 
   return (
-    <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)', overflow: 'hidden' }}>
+    <Card className="p-0 gap-0 overflow-hidden">
       <table className="w-full text-sm">
         <thead>
-          <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg)' }}>
+          <tr className="border-b bg-muted/50">
             <SortHeader col="id" label="Code" width="100px" />
             <SortHeader col="name" label="Product" />
             <SortHeader col="currentStock" label="Stock" width="160px" />
             <SortHeader col="shelf" label="Shelf" width="100px" />
             <SortHeader col="lastRestock" label="Last restocked" width="140px" />
-            <SortHeader col="velocity" label="Sells per hour" width="120px" />
+            <SortHeader col="velocity" label="Sells / hr" width="120px" />
             <SortHeader col="oosRisk" label="Status" width="120px" />
           </tr>
         </thead>
@@ -169,28 +153,27 @@ function TableView({ skus, search }: { skus: SKU[]; search: string }) {
           {filtered.map((sku) => (
             <tr
               key={sku.id}
-              style={{ borderBottom: '1px solid var(--border)', height: 44 }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)' }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
+              className="border-b hover:bg-muted/40 transition-colors"
+              style={{ height: 44 }}
             >
               <td className="px-4">
-                <Link href={`/inventory/${sku.id}`} className="data-mono text-xs" style={{ color: 'var(--brand-accent)' }}>
+                <Link href={`/inventory/${sku.id}`} className="font-mono text-xs font-medium hover:underline">
                   {sku.id}
                 </Link>
               </td>
-              <td className="px-4" style={{ color: 'var(--fg)' }}>{sku.name}</td>
+              <td className="px-4 text-sm">{sku.name}</td>
               <td className="px-4">
                 <StockBar current={sku.currentStock} max={sku.maxStock} />
               </td>
-              <td className="px-4" style={{ color: 'var(--fg-muted)' }}>{sku.shelf}</td>
-              <td className="px-4 text-xs" style={{ color: 'var(--fg-muted)' }}>
+              <td className="px-4 text-xs text-muted-foreground">{sku.shelf}</td>
+              <td className="px-4 text-xs text-muted-foreground">
                 {format(sku.lastRestock, 'MMM d, h:mm a')}
               </td>
-              <td className="px-4" style={{ color: 'var(--fg-muted)' }}>{sku.velocity}</td>
+              <td className="px-4 text-sm text-muted-foreground">{sku.velocity}</td>
               <td className="px-4">
                 <span className="flex items-center gap-1.5">
-                  <span style={{ fontSize: 8, color: RISK_COLORS[sku.oosRisk] }}>●</span>
-                  <span className="text-xs" style={{ color: RISK_COLORS[sku.oosRisk], textTransform: 'capitalize' }}>
+                  <span className={`size-1.5 rounded-full shrink-0 ${RISK_DOT[sku.oosRisk]}`} />
+                  <span className={`text-xs ${RISK_COLORS[sku.oosRisk]}`}>
                     {sku.oosRisk === 'low' ? 'Healthy' : sku.oosRisk === 'medium' ? 'Watch' : sku.oosRisk === 'high' ? 'Low' : 'Critical'}
                   </span>
                 </span>
@@ -199,12 +182,12 @@ function TableView({ skus, search }: { skus: SKU[]; search: string }) {
           ))}
         </tbody>
       </table>
-    </div>
+    </Card>
   )
 }
 
 export default function InventoryPage() {
-  const [view, setView] = useState<'grid' | 'table'>('table')
+  const [view, setView] = useState<'grid' | 'table'>('grid')
   const [search, setSearch] = useState('')
 
   const criticalCount = SKUS.filter((s) => s.oosRisk === 'critical' || s.oosRisk === 'high').length
@@ -213,37 +196,29 @@ export default function InventoryPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>
-            Stock
-          </h1>
-          <p className="text-sm mt-1" style={{ color: 'var(--fg-muted)' }}>
+          <h1 className="text-[18px] font-semibold tracking-tight">Stock</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
             Tracking {SKUS.length} products · {criticalCount} {criticalCount === 1 ? 'is' : 'are'} running low
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <input
+        <div className="flex items-center gap-2">
+          <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search SKU, name, shelf..."
-            className="px-3 py-1.5 text-xs rounded-sm outline-none"
-            style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-strong)', color: 'var(--fg)' }}
-            onFocus={(e) => { e.target.style.borderColor = 'var(--border-accent)' }}
-            onBlur={(e) => { e.target.style.borderColor = 'var(--border-strong)' }}
+            placeholder="Search SKU, name, shelf…"
+            className="h-8 w-56 text-xs"
           />
-          <div className="flex" style={{ border: '1px solid var(--border-strong)' }}>
+          <div className="flex rounded-lg border overflow-hidden">
             {(['grid', 'table'] as const).map((v) => (
-              <button
+              <Button
                 key={v}
+                variant="ghost"
+                size="sm"
                 onClick={() => setView(v)}
-                className="px-3 py-1.5 transition-colors"
-                style={{
-                  background: view === v ? 'var(--bg-hover)' : 'transparent',
-                  color: view === v ? 'var(--fg)' : 'var(--fg-dim)',
-                  borderRight: v === 'grid' ? '1px solid var(--border-strong)' : undefined,
-                }}
+                className={`h-8 px-2.5 rounded-none ${view === v ? 'bg-muted text-foreground' : 'text-muted-foreground'}`}
               >
-                {v === 'grid' ? <Grid size={14} /> : <List size={14} />}
-              </button>
+                {v === 'grid' ? <Grid className="size-3.5" /> : <List className="size-3.5" />}
+              </Button>
             ))}
           </div>
         </div>
@@ -251,26 +226,25 @@ export default function InventoryPage() {
 
       {/* Alerts rail */}
       {criticalCount > 0 && (
-        <div
-          className="flex flex-col gap-2 p-4"
-          style={{ borderRadius: 'var(--radius)', border: '1px solid rgba(248,113,113,0.3)', background: 'rgba(248,113,113,0.05)' }}
-        >
-          <div className="flex items-center gap-2">
-            <AlertTriangle size={14} style={{ color: 'var(--danger)' }} />
-            <span className="text-sm font-medium" style={{ color: 'var(--danger)' }}>About to run out</span>
+        <Card className="p-0 gap-0 border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/20 overflow-hidden">
+          <div className="flex items-center gap-2 px-4 py-3 border-b border-red-200 dark:border-red-900">
+            <AlertTriangle className="size-4 text-red-600 dark:text-red-400" />
+            <span className="text-sm font-semibold text-red-600 dark:text-red-400">About to run out</span>
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1.5 px-4 py-3">
             {SKUS.filter((s) => s.oosRisk === 'critical').slice(0, 3).map((sku) => (
-              <p key={sku.id} className="text-sm" style={{ color: 'var(--fg-muted)' }}>
-                <span style={{ color: 'var(--fg)', fontWeight: 500 }}>{sku.name}</span> ({sku.id}) will run out in{' '}
-                <span style={{ color: 'var(--danger)' }}>
-                  about {Math.round((sku.currentStock / (sku.velocity || 1)) * 60)} min
+              <p key={sku.id} className="text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">{sku.name}</span>{' '}
+                <Badge variant="outline" className="font-mono text-[10px] h-4 px-1 align-middle">{sku.id}</Badge>{' '}
+                will run out in{' '}
+                <span className="text-red-600 dark:text-red-400 font-medium">
+                  ~{Math.round((sku.currentStock / (sku.velocity || 1)) * 60)} min
                 </span>{' '}
                 — on {sku.shelf}
               </p>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Main view */}

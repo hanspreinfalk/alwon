@@ -3,9 +3,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import { useTheme } from 'next-themes'
-import { Bell, Search, Menu, Monitor, Sun, Moon, LogOut, Settings, User, ChevronDown } from 'lucide-react'
-import { LiveClock } from './live-clock'
 import {
+  Bell, Search, Monitor, Sun, Moon, LogOut, Settings, User,
+  ChevronDown, ShieldAlert, Package, Camera, CheckCheck,
+} from 'lucide-react'
+import { SidebarTrigger } from '@/components/ui/sidebar'
+import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -24,6 +28,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from '@/components/ui/dropdown-menu'
+import { cn } from '@/lib/utils'
 
 const ROUTES = [
   { label: 'Home', href: '/dashboard' },
@@ -51,6 +56,30 @@ const PATH_LABELS: Record<string, string> = {
   '/settings': 'Settings',
 }
 
+const NOTIFICATIONS = [
+  {
+    id: 1,
+    Icon: ShieldAlert,
+    title: 'Pick-without-pay detected',
+    desc: 'CAM-07 · LIMA-03 · 2 min ago',
+    read: false,
+  },
+  {
+    id: 2,
+    Icon: Camera,
+    title: 'Camera offline',
+    desc: 'CAM-18 · LIMA-03 · 15 min ago',
+    read: false,
+  },
+  {
+    id: 3,
+    Icon: Package,
+    title: 'Low stock — SKU 0482',
+    desc: 'SHELF-B3 · LIMA-03 · 1 hr ago',
+    read: true,
+  },
+]
+
 function Breadcrumb() {
   const pathname = usePathname()
   const segments = pathname.split('/').filter(Boolean)
@@ -59,16 +88,115 @@ function Breadcrumb() {
     <div className="flex items-center gap-1.5 text-sm">
       {segments.map((seg, i) => (
         <span key={i} className="flex items-center gap-1.5">
-          {i > 0 && <span style={{ color: 'var(--fg-dim)' }}>›</span>}
-          <span
-            className={i === segments.length - 1 ? 'font-medium' : ''}
-            style={{ color: i === segments.length - 1 ? 'var(--fg)' : 'var(--fg-muted)' }}
-          >
+          {i > 0 && <span className="text-muted-foreground/40">›</span>}
+          <span className={cn(
+            'text-sm',
+            i === segments.length - 1
+              ? 'font-medium text-foreground'
+              : 'text-muted-foreground'
+          )}>
             {PATH_LABELS[`/${seg}`] ?? seg.charAt(0).toUpperCase() + seg.slice(1)}
           </span>
         </span>
       ))}
     </div>
+  )
+}
+
+function NotificationsMenu() {
+  const router = useRouter()
+  const [notifications, setNotifications] = useState(NOTIFICATIONS)
+  const unread = notifications.filter((n) => !n.read).length
+
+  const markAllRead = () => setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="relative flex items-center justify-center h-8 w-8 rounded-md transition-colors hover:bg-accent text-muted-foreground hover:text-foreground outline-none">
+          <Bell size={15} strokeWidth={1.75} />
+          {unread > 0 && (
+            <span className="absolute top-0.5 right-0.5 flex items-center justify-center rounded-full text-[9px] font-bold leading-none"
+              style={{ width: 14, height: 14, background: 'var(--destructive)', color: '#fff' }}>
+              {unread}
+            </span>
+          )}
+        </button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end" className="w-80 p-0 rounded-xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 py-3 border-b">
+          <DropdownMenuLabel className="p-0 text-sm font-semibold flex items-center gap-2">
+            Notifications
+            {unread > 0 && (
+              <span className="inline-flex items-center justify-center size-5 rounded-full text-[10px] font-semibold bg-destructive text-destructive-foreground">
+                {unread}
+              </span>
+            )}
+          </DropdownMenuLabel>
+          {unread > 0 && (
+            <button
+              onClick={markAllRead}
+              className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <CheckCheck size={12} />
+              Mark all read
+            </button>
+          )}
+        </div>
+
+        {/* Notification items */}
+        <div className="flex flex-col">
+          {notifications.map((n) => {
+            const Icon = n.Icon
+            return (
+              <DropdownMenuItem
+                key={n.id}
+                className="flex items-start gap-3 px-4 py-3 rounded-none border-b last:border-b-0 cursor-pointer focus:bg-accent"
+                onClick={() => {
+                  setNotifications((prev) =>
+                    prev.map((x) => x.id === n.id ? { ...x, read: true } : x)
+                  )
+                  router.push('/events')
+                }}
+              >
+                {/* Icon badge */}
+                <div className={cn(
+                  'flex items-center justify-center rounded-md shrink-0 size-7 mt-0.5',
+                  n.read ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary'
+                )}>
+                  <Icon size={13} />
+                </div>
+
+                {/* Text */}
+                <div className="flex-1 min-w-0">
+                  <p className={cn('text-sm leading-tight truncate', !n.read && 'font-medium')}>
+                    {n.title}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">{n.desc}</p>
+                </div>
+
+                {/* Unread dot */}
+                {!n.read && (
+                  <span className="size-1.5 rounded-full bg-primary shrink-0 mt-1.5" />
+                )}
+              </DropdownMenuItem>
+            )
+          })}
+        </div>
+
+        {/* Footer */}
+        <div className="border-t px-4 py-2.5 bg-muted/30">
+          <button
+            onClick={() => router.push('/events')}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors w-full text-center"
+          >
+            View all activity →
+          </button>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
@@ -85,111 +213,62 @@ function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
-          className="flex items-center gap-2 rounded-sm transition-colors px-1 py-0.5 outline-none"
-          style={{ color: 'var(--fg-muted)' }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--fg)' }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--fg-muted)' }}
-        >
-          <div
-            className="flex items-center justify-center rounded-full text-xs font-medium shrink-0"
-            style={{
-              width: 28,
-              height: 28,
-              background: 'var(--bg-panel)',
-              color: 'var(--fg)',
-              border: '1px solid var(--border-strong)',
-            }}
-          >
-            E
+        <button className="flex items-center gap-1.5 rounded-md transition-colors px-1 py-0.5 outline-none hover:bg-accent text-muted-foreground hover:text-foreground">
+          <div className="flex items-center justify-center rounded-full text-xs font-semibold shrink-0 size-7 bg-muted text-foreground border border-border">
+            S
           </div>
           <ChevronDown size={12} className="hidden sm:block" />
         </button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent
-        align="end"
-        className="w-52"
-        style={{
-          background: 'var(--bg-elevated)',
-          border: '1px solid var(--border-strong)',
-          borderRadius: 'var(--radius)',
-        }}
-      >
+      <DropdownMenuContent align="end" className="w-52 rounded-xl">
         <DropdownMenuLabel>
           <div className="flex flex-col">
-            <span className="text-sm font-medium" style={{ color: 'var(--fg)' }}>Elena Martinez</span>
-            <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>Store Manager · LIMA-03</span>
+            <span className="text-sm font-medium">Santiago Garces</span>
+            <span className="text-xs text-muted-foreground font-normal">Store Manager · LIMA-03</span>
           </div>
         </DropdownMenuLabel>
 
-        <DropdownMenuSeparator style={{ background: 'var(--border)' }} />
+        <DropdownMenuSeparator />
 
-        <DropdownMenuItem
-          onClick={() => router.push('/settings')}
-          className="gap-2 cursor-pointer text-sm"
-          style={{ color: 'var(--fg-muted)' }}
-        >
+        <DropdownMenuItem onClick={() => router.push('/settings')} className="gap-2 cursor-pointer text-sm">
           <User size={14} />
           My account
         </DropdownMenuItem>
 
-        <DropdownMenuItem
-          onClick={() => router.push('/settings')}
-          className="gap-2 cursor-pointer text-sm"
-          style={{ color: 'var(--fg-muted)' }}
-        >
+        <DropdownMenuItem onClick={() => router.push('/settings')} className="gap-2 cursor-pointer text-sm">
           <Settings size={14} />
           Settings
         </DropdownMenuItem>
 
-        <DropdownMenuSeparator style={{ background: 'var(--border)' }} />
+        <DropdownMenuSeparator />
 
-        {/* Theme sub-menu */}
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger
-            className="gap-2 text-sm"
-            style={{ color: 'var(--fg-muted)' }}
-          >
+          <DropdownMenuSubTrigger className="gap-2 text-sm">
             {theme === 'light' ? <Sun size={14} /> : theme === 'dark' ? <Moon size={14} /> : <Monitor size={14} />}
             Appearance
-            <span className="ml-auto text-xs capitalize" style={{ color: 'var(--fg-muted)' }}>
-              {theme ?? 'system'}
-            </span>
+            <span className="ml-auto text-xs capitalize text-muted-foreground">{theme ?? 'system'}</span>
           </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent
-            style={{
-              background: 'var(--bg-elevated)',
-              border: '1px solid var(--border-strong)',
-              borderRadius: 'var(--radius)',
-            }}
-          >
+          <DropdownMenuSubContent className="rounded-xl">
             {themeOptions.map(({ label, value, icon: Icon }) => (
               <DropdownMenuItem
                 key={value}
                 onClick={() => setTheme(value)}
                 className="gap-2 cursor-pointer text-sm"
-                style={{
-                  color: theme === value ? 'var(--brand-accent)' : 'var(--fg-muted)',
-                  background: theme === value ? 'var(--brand-accent-glow)' : undefined,
-                }}
               >
                 <Icon size={13} />
                 {label}
-                {theme === value && (
-                  <span className="ml-auto" style={{ color: 'var(--brand-accent)', fontSize: 8 }}>●</span>
-                )}
+                {theme === value && <span className="ml-auto text-[8px]">●</span>}
               </DropdownMenuItem>
             ))}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
 
-        <DropdownMenuSeparator style={{ background: 'var(--border)' }} />
+        <DropdownMenuSeparator />
 
         <DropdownMenuItem
           onClick={() => router.push('/login')}
-          className="gap-2 cursor-pointer text-sm"
-          style={{ color: 'var(--danger)' }}
+          className="gap-2 cursor-pointer text-sm text-destructive focus:text-destructive"
         >
           <LogOut size={14} />
           Sign out
@@ -199,10 +278,7 @@ function UserMenu() {
   )
 }
 
-export function Topbar({ onMobileMenuToggle, onSidebarToggle }: {
-  onMobileMenuToggle?: () => void
-  onSidebarToggle?: () => void
-}) {
+export function Topbar() {
   const [cmdOpen, setCmdOpen] = useState(false)
   const router = useRouter()
 
@@ -224,23 +300,11 @@ export function Topbar({ onMobileMenuToggle, onSidebarToggle }: {
   return (
     <>
       <header
-        className="sticky top-0 z-40 flex items-center gap-3 px-4 md:px-5"
-        style={{
-          height: 56,
-          background: 'var(--bg)',
-          borderBottom: '1px solid var(--border)',
-        }}
+        className="sticky top-0 z-40 flex items-center gap-3 px-3 md:px-4 border-b"
+        style={{ height: 52, background: 'var(--bg)' }}
       >
-        {/* Mobile menu toggle */}
-        <button
-          onClick={onMobileMenuToggle}
-          className="md:hidden p-1"
-          style={{ color: 'var(--fg-muted)' }}
-        >
-          <Menu size={18} />
-        </button>
+        <SidebarTrigger className="-ml-1" />
 
-        {/* Breadcrumb */}
         <div className="flex-1 hidden sm:block">
           <Breadcrumb />
         </div>
@@ -248,72 +312,41 @@ export function Topbar({ onMobileMenuToggle, onSidebarToggle }: {
         {/* Command palette trigger */}
         <button
           onClick={() => setCmdOpen(true)}
-          className="flex items-center gap-2 px-3 py-1.5 transition-colors rounded-md"
-          style={{
-            background: 'var(--bg-elevated)',
-            border: '1px solid var(--border)',
-            color: 'var(--fg-dim)',
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--border-strong)' }}
-          onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)' }}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-md transition-colors bg-muted/60 hover:bg-muted border border-border text-muted-foreground text-xs"
         >
           <Search size={13} />
-          <span className="text-xs hidden sm:block">Search anything…</span>
-          <kbd
-            className="data-mono hidden md:block px-1 py-0.5"
-            style={{ background: 'var(--bg-panel)', border: '1px solid var(--border-strong)', fontSize: '0.65rem', borderRadius: 4 }}
-          >
+          <span className="hidden sm:block">Search anything…</span>
+          <kbd className="hidden md:block px-1 py-0.5 rounded text-[10px] bg-background border border-border font-mono">
             ⌘K
           </kbd>
         </button>
 
-        {/* Right side */}
-        <div className="flex items-center gap-3">
-          <LiveClock />
-
-          {/* Notifications */}
-          <button className="relative p-1" style={{ color: 'var(--fg-dim)' }}>
-            <Bell size={16} strokeWidth={1.5} />
-            <span
-              className="absolute -top-0.5 -right-0.5 flex items-center justify-center data-mono rounded-full"
-              style={{ width: 14, height: 14, background: 'var(--danger)', color: '#fff', fontSize: 9 }}
-            >
-              3
-            </span>
-          </button>
-
-          {/* User dropdown */}
+        <div className="flex items-center gap-1">
+          <NotificationsMenu />
           <UserMenu />
         </div>
       </header>
 
-      {/* Command palette */}
       <CommandDialog open={cmdOpen} onOpenChange={setCmdOpen}>
-        <CommandInput
-          placeholder="Search events, SKUs, cameras, stores..."
-          className="data-mono text-xs"
-        />
-        <CommandList>
-          <CommandEmpty>
-            <span className="text-sm" style={{ color: 'var(--fg-muted)' }}>
-              Nothing matches that search.
-            </span>
-          </CommandEmpty>
-          <CommandGroup heading="Pages">
-            {ROUTES.map((r) => (
-              <CommandItem
-                key={r.href}
-                value={r.label}
-                onSelect={() => {
-                  router.push(r.href)
-                  setCmdOpen(false)
-                }}
-              >
-                <span className="text-sm">{r.label}</span>
-              </CommandItem>
-            ))}
-          </CommandGroup>
-        </CommandList>
+        <Command>
+          <CommandInput placeholder="Search events, SKUs, cameras, stores..." className="text-xs" />
+          <CommandList>
+            <CommandEmpty>
+              <span className="text-sm text-muted-foreground">Nothing matches that search.</span>
+            </CommandEmpty>
+            <CommandGroup heading="Pages">
+              {ROUTES.map((r) => (
+                <CommandItem
+                  key={r.href}
+                  value={r.label}
+                  onSelect={() => { router.push(r.href); setCmdOpen(false) }}
+                >
+                  <span className="text-sm">{r.label}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </CommandDialog>
     </>
   )

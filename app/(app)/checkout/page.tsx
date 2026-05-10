@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { SectionHeader } from '@/components/section-header'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { generateCheckoutSessions } from '@/lib/mock-data'
 import { format } from 'date-fns'
 
@@ -30,19 +30,14 @@ export default function CheckoutPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-semibold" style={{ color: 'var(--fg)' }}>
-          Checkout
-        </h1>
-        <p className="text-sm mt-1" style={{ color: 'var(--fg-muted)' }}>
+        <h1 className="text-[18px] font-semibold tracking-tight">Checkout</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">
           See how customers are paying right now.
         </p>
       </div>
 
-      {/* Metric tiles */}
-      <div
-        className="grid grid-cols-1 sm:grid-cols-3"
-        style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}
-      >
+      {/* Metric tiles — p-4 matching home page stat tiles */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 rounded-xl overflow-hidden ring-1 ring-foreground/10">
         {[
           { label: 'Walk-outs', value: walkouts, sub: 'no checkout needed' },
           { label: 'Self-checkout', value: kiosks, sub: 'used a kiosk' },
@@ -50,137 +45,129 @@ export default function CheckoutPage() {
         ].map((tile, i, arr) => (
           <div
             key={tile.label}
-            className="p-5"
-            style={{ borderRight: i < arr.length - 1 ? '1px solid var(--border)' : undefined }}
+            className={`flex flex-col gap-1 p-4 bg-card ${i < arr.length - 1 ? 'border-r' : ''}`}
           >
-            <p className="text-xs" style={{ color: 'var(--fg-muted)' }}>{tile.label}</p>
-            <p className="font-semibold mt-1" style={{ fontSize: '1.625rem', color: 'var(--fg)', fontVariantNumeric: 'tabular-nums' }}>
+            <p className="text-xs text-muted-foreground font-medium">{tile.label}</p>
+            <p className="text-[1.625rem] font-semibold tabular-nums leading-tight">
               {tile.value.toLocaleString()}
             </p>
-            <p className="text-xs mt-0.5" style={{ color: 'var(--fg-muted)' }}>{tile.sub}</p>
+            <p className="text-xs text-muted-foreground">{tile.sub}</p>
           </div>
         ))}
       </div>
 
       {/* Flow visualization */}
-      <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
-        <div className="px-5 pt-4">
-          <SectionHeader
-            title="How customers are checking out"
-            description="Where shoppers go when they're ready to leave"
-          />
-        </div>
-        <div className="flex items-center justify-center gap-8 py-8 px-6" style={{ borderTop: '1px solid var(--border)' }}>
-          {/* Entry */}
-          <div className="flex flex-col items-center gap-2">
-            <div
-              className="flex items-center justify-center"
-              style={{ width: 64, height: 64, border: '1px solid var(--border-strong)', background: 'var(--bg-elevated)' }}
-            >
-              <span className="data-mono text-xs text-center" style={{ color: 'var(--fg-muted)' }}>ENTRY</span>
-            </div>
-            <p className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>{total} sessions</p>
-          </div>
-
-          {/* Arrow */}
-          <div style={{ flex: 1, height: 1, background: 'var(--border-strong)' }} />
-
-          {/* Routes */}
-          <div className="flex flex-col gap-3">
-            {[
-              { label: 'Walked out', count: routeCounts['walk-out'], color: 'var(--brand-accent)' },
-              { label: 'Self-checkout', count: routeCounts['kiosk'], color: 'var(--success)' },
-              { label: 'Assisted by staff', count: routeCounts['assisted'], color: 'var(--warning)' },
-            ].map((route) => (
-              <div key={route.label} className="flex items-center gap-3">
-                <div style={{ height: 1, width: 40, background: route.color, opacity: 0.5 }} />
-                <div
-                  className="px-3 py-2 rounded-md"
-                  style={{
-                    border: `1px solid ${route.color}`,
-                    background: `rgba(${route.color === 'var(--brand-accent)' ? '6,144,252' : route.color === 'var(--success)' ? '74,222,128' : '251,191,36'},0.05)`,
-                    minWidth: 140,
-                  }}
-                >
-                  <p className="text-sm font-medium" style={{ color: route.color }}>{route.label}</p>
-                  <p className="text-xs mt-0.5" style={{ color: 'var(--fg-muted)' }}>
-                    {route.count} customers · {total > 0 ? Math.round(route.count / total * 100) : 0}%
-                  </p>
-                </div>
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-semibold">How customers are checking out</CardTitle>
+          <CardDescription>Where shoppers go when they&apos;re ready to leave</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center gap-8 py-2 px-2 flex-wrap">
+            {/* Entry */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex items-center justify-center rounded-lg border bg-muted size-16">
+                <span className="font-mono text-xs text-center text-muted-foreground">ENTRY</span>
               </div>
-            ))}
-          </div>
-
-          <div style={{ flex: 1, height: 1, background: 'var(--border-strong)' }} />
-
-          {/* Exit */}
-          <div className="flex flex-col items-center gap-2">
-            <div
-              className="flex items-center justify-center"
-              style={{ width: 64, height: 64, border: '1px solid var(--border-strong)', background: 'var(--bg-elevated)' }}
-            >
-              <span className="data-mono text-xs text-center" style={{ color: 'var(--fg-muted)' }}>EXIT</span>
+              <p className="font-mono text-xs text-muted-foreground">{total} sessions</p>
             </div>
-            <p className="data-mono text-xs" style={{ color: 'var(--fg-dim)' }}>
-              {sessions.filter((s) => s.status === 'completed').length} complete
-            </p>
+
+            <div className="flex-1 border-t min-w-8" />
+
+            {/* Routes */}
+            <div className="flex flex-col gap-3">
+              {[
+                {
+                  label: 'Walked out',
+                  count: routeCounts['walk-out'],
+                  className: 'border-foreground/30 bg-foreground/5',
+                  textClass: 'text-foreground',
+                },
+                {
+                  label: 'Self-checkout',
+                  count: routeCounts['kiosk'],
+                  className: 'border-green-300 bg-green-500/5 dark:border-green-800',
+                  textClass: 'text-green-600 dark:text-green-400',
+                },
+                {
+                  label: 'Assisted by staff',
+                  count: routeCounts['assisted'],
+                  className: 'border-amber-300 bg-amber-500/5 dark:border-amber-800',
+                  textClass: 'text-amber-600 dark:text-amber-400',
+                },
+              ].map((route) => (
+                <div key={route.label} className="flex items-center gap-3">
+                  <div className="border-t w-8 border-border" />
+                  <div className={`px-3 py-2 rounded-lg border min-w-40 ${route.className}`}>
+                    <p className={`text-sm font-medium ${route.textClass}`}>{route.label}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {route.count} customers · {total > 0 ? Math.round(route.count / total * 100) : 0}%
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex-1 border-t min-w-8" />
+
+            {/* Exit */}
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex items-center justify-center rounded-lg border bg-muted size-16">
+                <span className="font-mono text-xs text-center text-muted-foreground">EXIT</span>
+              </div>
+              <p className="font-mono text-xs text-muted-foreground">
+                {sessions.filter((s) => s.status === 'completed').length} complete
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Session table */}
-      <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--border)', background: 'var(--bg-panel)' }}>
-        <div className="px-5 pt-4">
-          <SectionHeader
-            title="Customers in the store now"
-            description="Live sessions and how they're checking out"
-          />
+      <Card className="p-0 gap-0 overflow-hidden">
+        <CardHeader className="px-4 py-3 border-b">
+          <CardTitle className="text-sm font-semibold">Customers in the store now</CardTitle>
+          <CardDescription>Live sessions and how they&apos;re checking out</CardDescription>
+        </CardHeader>
+        <div className="flex items-center gap-3 px-4 py-2.5 border-b bg-muted/50">
+          <span className="text-xs text-muted-foreground font-medium w-24">Customer</span>
+          <span className="text-xs text-muted-foreground font-medium w-20">Entered</span>
+          <span className="text-xs text-muted-foreground font-medium w-24">Method</span>
+          <span className="text-xs text-muted-foreground font-medium w-20">Confidence</span>
+          <span className="text-xs text-muted-foreground font-medium flex-1">Status</span>
+          <span className="text-xs text-muted-foreground font-medium w-20 text-right">Value</span>
         </div>
-        <div style={{ borderTop: '1px solid var(--border)' }}>
-          <div className="flex items-center gap-3 px-4 py-2.5" style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg)' }}>
-            <span className="text-xs w-24" style={{ color: 'var(--fg-muted)' }}>Customer</span>
-            <span className="text-xs w-20" style={{ color: 'var(--fg-muted)' }}>Entered</span>
-            <span className="text-xs w-24" style={{ color: 'var(--fg-muted)' }}>Method</span>
-            <span className="text-xs w-20" style={{ color: 'var(--fg-muted)' }}>Confidence</span>
-            <span className="text-xs flex-1" style={{ color: 'var(--fg-muted)' }}>Status</span>
-            <span className="text-xs w-20 text-right" style={{ color: 'var(--fg-muted)' }}>Value</span>
+        {sessions.slice(0, 15).map((session) => (
+          <div
+            key={session.id}
+            className="flex items-center gap-3 px-4 border-b hover:bg-muted/40 transition-colors"
+            style={{ height: 44 }}
+          >
+            <span className="font-mono text-xs w-24 font-medium">{session.id}</span>
+            <span className="text-xs w-20 text-muted-foreground">
+              {format(session.entryTime, 'HH:mm')}
+            </span>
+            <span className="text-xs w-24 text-muted-foreground">
+              {session.route === 'walk-out' ? 'Walked out' : session.route === 'kiosk' ? 'Kiosk' : 'Assisted'}
+            </span>
+            <span className="text-xs w-20 text-muted-foreground tabular-nums">
+              {Math.round(session.confidence * 100)}%
+            </span>
+            <span className="flex items-center gap-1.5 flex-1">
+              <span className={`size-1.5 rounded-full shrink-0 ${
+                session.status === 'completed' ? 'bg-green-500' :
+                session.status === 'in-progress' ? 'bg-foreground' : 'bg-muted-foreground'
+              }`} />
+              <span className="text-xs text-muted-foreground">
+                {session.status === 'in-progress' ? 'In progress' : session.status === 'completed' ? 'Done' : 'Left'}
+              </span>
+            </span>
+            <span className="text-xs w-20 text-right text-muted-foreground tabular-nums">
+              ${session.estimatedValue.toFixed(2)}
+            </span>
           </div>
-          {sessions.slice(0, 15).map((session) => (
-            <div
-              key={session.id}
-              className="flex items-center gap-3 px-4"
-              style={{ height: 44, borderBottom: '1px solid var(--border)' }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--bg-hover)' }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
-            >
-              <span className="data-mono text-xs w-24" style={{ color: 'var(--fg)' }}>{session.id}</span>
-              <span className="text-xs w-20" style={{ color: 'var(--fg-muted)' }}>
-                {format(session.entryTime, 'HH:mm')}
-              </span>
-              <span className="text-xs w-24" style={{ color: 'var(--fg-muted)' }}>
-                {session.route === 'walk-out' ? 'Walked out' : session.route === 'kiosk' ? 'Kiosk' : 'Assisted'}
-              </span>
-              <span className="text-xs w-20" style={{ color: 'var(--fg-muted)' }}>
-                {Math.round(session.confidence * 100)}%
-              </span>
-              <span className="flex items-center gap-1.5 flex-1">
-                <span style={{
-                  fontSize: 8,
-                  color: session.status === 'completed' ? 'var(--success)'
-                    : session.status === 'in-progress' ? 'var(--brand-accent)'
-                    : 'var(--fg-muted)',
-                }}>●</span>
-                <span className="text-xs" style={{ color: 'var(--fg-muted)' }}>
-                  {session.status === 'in-progress' ? 'In progress' : session.status === 'completed' ? 'Done' : 'Left'}
-                </span>
-              </span>
-              <span className="text-xs w-20 text-right" style={{ color: 'var(--fg-muted)', fontVariantNumeric: 'tabular-nums' }}>
-                ${session.estimatedValue.toFixed(2)}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
+        ))}
+      </Card>
     </div>
   )
 }

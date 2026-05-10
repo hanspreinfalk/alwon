@@ -33,9 +33,9 @@ export function EventStream({ limit = 50 }: EventStreamProps) {
   const displayed = events.slice(0, limit)
 
   return (
-    <div className="flex flex-col overflow-hidden" style={{ borderTop: '1px solid var(--border)' }}>
+    <div className="flex flex-col h-full overflow-hidden">
 
-      <div className="overflow-y-auto" style={{ maxHeight: 440 }}>
+      <div className="flex-1 overflow-y-auto h-full">
         <AnimatePresence initial={false}>
           {displayed.map((event: StoreEvent) => (
             <motion.div
