@@ -445,15 +445,10 @@ export default function EventsPage() {
             </p>
           </div>
           <Button
-            variant="outline"
+            variant={paused ? 'secondary' : 'outline'}
             size="sm"
             onClick={() => paused ? resumeStream() : pauseStream()}
-            className={cn(
-              'gap-2 shrink-0 h-8 text-xs rounded-lg',
-              paused
-                ? 'border-green-300 text-green-600 hover:bg-green-50 dark:border-green-800 dark:text-green-400'
-                : 'border-blue-300 text-blue-600 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-400'
-            )}
+            className="gap-2 shrink-0 h-8 text-xs"
           >
             {paused ? <>▶ Resume</> : <><LiveIndicator /> Pause</>}
           </Button>
